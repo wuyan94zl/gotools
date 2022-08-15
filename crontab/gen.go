@@ -1,8 +1,13 @@
-package command
+package crontab
 
 import (
 	"fmt"
 	"github.com/wuyan94zl/gotools/utils"
+)
+
+var (
+	VarStringName string
+	VarStringDir  string
 )
 
 var tpl = `package {{.package}}
