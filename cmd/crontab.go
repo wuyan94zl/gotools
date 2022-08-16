@@ -3,7 +3,7 @@ package cmd
 import (
 	"fmt"
 	"github.com/spf13/cobra"
-	"github.com/wuyan94zl/gotools/crontab"
+	"github.com/wuyan94zl/gotools/crontabcmd"
 )
 
 // cronCmd represents the cron command
@@ -16,7 +16,7 @@ var cronCmd = &cobra.Command{
 			fmt.Println("cron name not null")
 			return
 		}
-		app := &crontab.Command{
+		app := &crontabcmd.Command{
 			Name: args[0],
 		}
 		app.Run()
@@ -24,7 +24,7 @@ var cronCmd = &cobra.Command{
 }
 
 func init() {
-	cronCmd.Flags().StringVarP(&crontab.VarStringName, "name", "n", "", "")
-	cronCmd.Flags().StringVarP(&crontab.VarStringDir, "dir", "d", "", "")
+	cronCmd.Flags().StringVarP(&crontabcmd.VarStringName, "name", "n", "", "")
+	cronCmd.Flags().StringVarP(&crontabcmd.VarStringDir, "dir", "d", "", "")
 	rootCmd.AddCommand(cronCmd)
 }

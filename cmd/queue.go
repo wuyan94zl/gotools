@@ -2,9 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/wuyan94zl/gotools/crontab"
-	"github.com/wuyan94zl/gotools/queue"
-
 	"github.com/spf13/cobra"
 )
 
@@ -18,7 +15,7 @@ var queueCmd = &cobra.Command{
 			fmt.Println("model name not null")
 			return
 		}
-		app := &queue.Command{
+		app := &queuecmd.Command{
 			Name: args[0],
 		}
 		app.Run()
@@ -26,7 +23,7 @@ var queueCmd = &cobra.Command{
 }
 
 func init() {
-	queueCmd.Flags().StringVarP(&crontab.VarStringName, "name", "n", "", "")
-	queueCmd.Flags().StringVarP(&crontab.VarStringDir, "dir", "d", "", "")
+	queueCmd.Flags().StringVarP(&crontabcmd.VarStringName, "name", "n", "", "")
+	queueCmd.Flags().StringVarP(&crontabcmd.VarStringDir, "dir", "d", "", "")
 	rootCmd.AddCommand(queueCmd)
 }
