@@ -19,5 +19,6 @@ var gormCmd = &cobra.Command{
 func init() {
 	gormCmd.Flags().StringVarP(&gorm.VarStringSrc, "src", "s", "", "The path or path globbing patterns of the ddl")
 	gormCmd.Flags().StringVarP(&gorm.VarStringDir, "dir", "d", "", "The path or path globbing patterns of the ddl")
+	gormCmd.Flags().BoolVarP(&gorm.VarBoolCache, "cache", "c", false, "is cache")
 	rootCmd.AddCommand(gormCmd)
 }

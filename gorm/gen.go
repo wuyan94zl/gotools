@@ -9,6 +9,7 @@ import (
 
 var VarStringSrc string
 var VarStringDir string
+var VarBoolCache bool
 
 type Command struct {
 	packageName string
@@ -42,11 +43,21 @@ func (c *Command) Run() error {
 	c.structData = structData.StructCode[0].Code
 	c.structName = structData.StructCode[0].Table
 	c.wd = wd
-	if err := setGormNoCacheModel(c); err != nil {
-		return err
+	if VarBoolCache {
+		if err := setGormModel(c); err != nil {
+			return err
+		}
+		if err := setGormCustomModel(c); err != nil {
+			return err
+		}
+	} else {
+		if err := setGormNoCacheModel(c); err != nil {
+			return err
+		}
+		if err := setGormNoCacheCustomModel(c); err != nil {
+			return err
+		}
 	}
-	if err := setGormNoCacheCustomModel(c); err != nil {
-		return err
-	}
+
 	return nil
 }
