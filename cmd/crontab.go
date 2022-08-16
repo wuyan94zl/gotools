@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"fmt"
 	"github.com/spf13/cobra"
 	"github.com/wuyan94zl/gotools/crontabcmd"
 )
@@ -12,13 +11,7 @@ var cronCmd = &cobra.Command{
 	Short: "create crontab script",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		if len(args) == 0 {
-			fmt.Println("cron name not null")
-			return
-		}
-		app := &crontabcmd.Command{
-			Name: args[0],
-		}
+		app := &crontabcmd.Command{}
 		app.Run()
 	},
 }
