@@ -1,8 +1,8 @@
 package cmd
 
 import (
-	"fmt"
 	"github.com/spf13/cobra"
+	"github.com/wuyan94zl/gotools/queuecmd"
 )
 
 // queueCmd represents the queue command
@@ -11,19 +11,13 @@ var queueCmd = &cobra.Command{
 	Short: "create queue script",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		if len(args) == 0 {
-			fmt.Println("model name not null")
-			return
-		}
-		app := &queuecmd.Command{
-			Name: args[0],
-		}
-		app.Run()
+		queue := &queuecmd.Command{}
+		queue.Run()
 	},
 }
 
 func init() {
-	queueCmd.Flags().StringVarP(&crontabcmd.VarStringName, "name", "n", "", "")
-	queueCmd.Flags().StringVarP(&crontabcmd.VarStringDir, "dir", "d", "", "")
+	queueCmd.Flags().StringVarP(&queuecmd.VarStringName, "name", "n", "", "定义队列名称")
+	queueCmd.Flags().StringVarP(&queuecmd.VarStringDir, "dir", "d", "", "队列代码目录")
 	rootCmd.AddCommand(queueCmd)
 }
