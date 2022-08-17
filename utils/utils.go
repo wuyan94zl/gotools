@@ -1,7 +1,9 @@
 package utils
 
 import (
+	"bufio"
 	"bytes"
+	"errors"
 	"go/format"
 	"os"
 	"path/filepath"
@@ -13,6 +15,24 @@ type FileGenConfig struct {
 	Filename     string
 	TemplateFile string
 	Data         interface{}
+}
+
+func GenFileCover(c FileGenConfig) error {
+	fp, _, err := CreteFile(c.Dir, c.Filename)
+	defer fp.Close()
+	if err != nil {
+		return err
+	}
+	text := c.TemplateFile
+	var t = template.Must(template.New("name").Parse(text))
+	buffer := new(bytes.Buffer)
+	err = t.Execute(buffer, c.Data)
+	if err != nil {
+		return err
+	}
+	code := FormatCode(buffer.String())
+	_, err = fp.WriteString(code)
+	return err
 }
 
 func GenFile(c FileGenConfig) error {
@@ -58,10 +78,33 @@ func MaybeCreteFile(dir string, fileName string) (fp *os.File, created bool, err
 	return
 }
 
+func CreteFile(dir string, fileName string) (fp *os.File, created bool, err error) {
+	if _, err = os.Stat(dir); err != nil {
+		os.MkdirAll(dir, 0777)
+	}
+	fPath := filepath.Join(dir, fileName)
+	fp, err = os.Create(fPath)
+	created = err == nil
+	return
+}
+
 func GetDir(method string, name string) string {
 	baseDir, err := os.Getwd()
 	if err != nil {
 		return ""
 	}
 	return filepath.Join(baseDir, "app", method, name)
+}
+
+func GetPackage() (string, error) {
+	wd, _ := os.Getwd()
+	open, _ := os.Open(filepath.Join(wd, "go.mod"))
+	defer open.Close()
+
+	buf := bufio.NewReader(open)
+	line, _, _ := buf.ReadLine()
+	if len(line) < 7 {
+		return "", errors.New("执行位置错误")
+	}
+	return string(line)[7:], nil
 }

@@ -7,7 +7,6 @@ import (
 
 var (
 	VarStringName string
-	VarStringDir  string
 )
 
 type Command struct {
@@ -17,16 +16,14 @@ type Command struct {
 
 func (c *Command) Run() error {
 	wd, _ := os.Getwd()
-	if VarStringDir != "." {
-		wd = filepath.Join(wd, VarStringDir)
-	}
-	wd = filepath.Join(wd, VarStringName)
-	_, packageName := filepath.Split(wd)
+	wd = filepath.Join(wd, "queue")
 
-	c.packageName = packageName
+	c.packageName = VarStringName
+	c.wd = filepath.Join(wd, VarStringName)
+	genJob(c)
+
+	c.packageName = "queue"
 	c.wd = wd
-	if err := genQueueGen(c); err != nil {
-		return err
-	}
-	return genQueue(c)
+	genBase(c)
+	return nil
 }

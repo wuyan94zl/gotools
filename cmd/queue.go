@@ -18,6 +18,5 @@ var queueCmd = &cobra.Command{
 
 func init() {
 	queueCmd.Flags().StringVarP(&queuecmd.VarStringName, "name", "n", "", "定义队列名称")
-	queueCmd.Flags().StringVarP(&queuecmd.VarStringDir, "dir", "d", "", "队列代码目录")
 	rootCmd.AddCommand(queueCmd)
 }
