@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-const Spec = "0 * * * * *" // todo 设置定时时间 秒 分 时 日 月 周
+const Spec = "* * * * * *" // todo 设置定时时间 秒 分 时 日 月 周
 
 func NewJob() *Job {
 	return &Job{}
@@ -19,7 +19,7 @@ type Job struct {}
 
 func (j *Job) Run() {
 	// todo 定时处理逻辑
-	fmt.Println("Execution per minute", time.Now().Format("2006-01-02 15:4:05"))
+	fmt.Println("crontab exec：", time.Now().Format("2006-01-02 15:4:05"))
 }
 
 `

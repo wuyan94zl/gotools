@@ -22,7 +22,7 @@ func init() {
 
 
 func newCron() *cron.Cron {
-	if Cron != nil {
+	if Cron == nil {
 		Cron = cron.New(cron.WithSeconds())
 	}
 	return Cron

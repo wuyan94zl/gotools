@@ -27,7 +27,7 @@ var queue *Instance
 var mux *asynq.ServeMux
 
 func newMux() *asynq.ServeMux {
-	if mux != nil {
+	if mux == nil {
 		mux = asynq.NewServeMux()
 	}
 	return mux
