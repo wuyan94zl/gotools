@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"github.com/spf13/cobra"
 	"github.com/wuyan94zl/gotools/gorm"
 )
@@ -12,7 +13,12 @@ var gormCmd = &cobra.Command{
 	Long:  `mysql ddl to gorm model code`,
 	Run: func(cmd *cobra.Command, args []string) {
 		model := &gorm.Command{}
-		model.Run()
+		err := model.Run()
+		if err != nil {
+			fmt.Println(err)
+		} else {
+			fmt.Println("Down .")
+		}
 	},
 }
 

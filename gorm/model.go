@@ -44,7 +44,7 @@ func new{{.StructName}}Model(gormDb *gorm.DB, cache *redis.Client) *default{{.St
 }
 
 func (m *default{{.StructName}}Model) Insert(ctx context.Context, data *{{.StructName}}) (*{{.StructName}}, error) {
-	err := m.Conn.Create(data).Error
+	err := m.Conn.WithContext(ctx).Create(data).Error
 	return data, err
 }
 
@@ -52,7 +52,7 @@ func (m *default{{.StructName}}Model) First(ctx context.Context, id int64) (*{{.
 	key := fmt.Sprintf("%s%d", cacheKey, id)
 	info := new({{.StructName}})
 	err := m.CacheFirst(ctx, info, func() error {
-		err := m.Conn.Find(info, id).Error
+		err := m.Conn.WithContext(ctx).Find(info, id).Error
 		_, err = m.empty(info, err)
 		return err
 	}, key)
@@ -62,7 +62,7 @@ func (m *default{{.StructName}}Model) First(ctx context.Context, id int64) (*{{.
 func (m *default{{.StructName}}Model) Update(ctx context.Context, data *{{.StructName}}) error {
 	key := fmt.Sprintf("%s%d", cacheKey, data.ID)
 	return m.CacheUpdate(ctx, func() error {
-		return m.Conn.Save(data).Error
+		return m.Conn.WithContext(ctx).Save(data).Error
 	}, key)
 }
 
@@ -73,7 +73,7 @@ func (m *default{{.StructName}}Model) Delete(ctx context.Context, id int64) erro
 		return err
 	}
 	return m.CacheDelete(ctx, func() error {
-		return m.Conn.Delete(info, id).Error
+		return m.Conn.WithContext(ctx).Delete(info, id).Error
 	}, key)
 }
 

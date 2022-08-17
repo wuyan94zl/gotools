@@ -9,6 +9,7 @@ import (
 var noCacheModelTpl = `package {{.package}}
 
 import (
+	"context"
 	"errors"
 	"time"
 
@@ -21,10 +22,10 @@ var NotFoundErr = errors.New("数据不存在")
 
 type (
 	{{.structName}}Model interface {
-		Insert(data *{{.StructName}}) (*{{.StructName}}, error)
-		First(id int64) (*{{.StructName}}, error)
-		Update(data *{{.StructName}}) error
-		Delete(id int64) error
+		Insert(ctx context.Context, data *{{.StructName}}) (*{{.StructName}}, error)
+		First(ctx context.Context, id int64) (*{{.StructName}}, error)
+		Update(ctx context.Context, data *{{.StructName}}) error
+		Delete(ctx context.Context, id int64) error
 	}
 	default{{.StructName}}Model struct {
 		Conn *gorm.DB
@@ -37,23 +38,23 @@ func new{{.StructName}}Model(gormDb *gorm.DB) *default{{.StructName}}Model {
 	return model
 }
 
-func (m *default{{.StructName}}Model) Insert(data *{{.StructName}}) (*{{.StructName}}, error) {
-	err := m.Conn.Create(data).Error
+func (m *default{{.StructName}}Model) Insert(ctx context.Context, data *{{.StructName}}) (*{{.StructName}}, error) {
+	err := m.Conn.WithContext(ctx).Create(data).Error
 	return m.empty(data, err)
 }
 
-func (m *default{{.StructName}}Model) First(id int64) (*{{.StructName}}, error) {
+func (m *default{{.StructName}}Model) First(ctx context.Context, id int64) (*{{.StructName}}, error) {
 	info := new({{.StructName}})
-	err := m.Conn.Find(info, id).Error
+	err := m.Conn.WithContext(ctx).Find(info, id).Error
 	return m.empty(info, err)
 }
 
-func (m *default{{.StructName}}Model) Update(data *{{.StructName}}) error {
-	return m.Conn.Save(data).Error
+func (m *default{{.StructName}}Model) Update(ctx context.Context, data *{{.StructName}}) error {
+	return m.Conn.WithContext(ctx).Save(data).Error
 }
 
-func (m *default{{.StructName}}Model) Delete(id int64) error {
-	return m.Conn.Where("id = ?", id).Delete(new({{.StructName}})).Error
+func (m *default{{.StructName}}Model) Delete(ctx context.Context, id int64) error {
+	return m.Conn.WithContext(ctx).Where("id = ?", id).Delete(new({{.StructName}})).Error
 }
 
 func (m *default{{.StructName}}Model) empty(info *{{.StructName}}, err error) (*{{.StructName}}, error) {

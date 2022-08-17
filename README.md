@@ -14,7 +14,7 @@
 `gotools crontab --name mycron2`  
 执行上面两个命令，就能生成以下文件目录代码
 
-### 包结构
+### 目录结构
 ```sh
 crontab         # 主文件夹             
     mycron1      # 定时任务功能代码包1
@@ -44,7 +44,7 @@ group.Start()
 `gotools queue --name myqueue2`  
 执行上面两个命令，就能生成以下文件目录代码
 
-### 包结构
+### 目录结构
 ```sh
 queue         # 主文件夹             
     myqueue1      # 定时任务功能代码包1
@@ -73,3 +73,25 @@ group.Start()
 ### 命令
 `gotools gorm --src user.sql --dir user --cache true`
 
+### 目录结构
+```sh
+models                  # 主文件夹             
+    user                # model 包
+      model.go          # 自定义文件，如增加函数等
+      model_gen.go      # 生成文件，不需要改动
+    user.sql            # sql 表创建文件
+```
+### 使用
+```go
+// cache model
+uModel := user.NewChatUsersModel(gormDB,redisCli)
+
+// no cache model
+// uModel := user.NewChatUsersModel(gormDB)
+
+uModel.Insert(ctx,user.Users{})
+uModel.First(ctx,id)
+uModel.Update(ctx,user.Users{})
+uModel.Delete(ctx,id)
+
+```

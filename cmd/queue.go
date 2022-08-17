@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"github.com/spf13/cobra"
 	"github.com/wuyan94zl/gotools/queuecmd"
 )
@@ -12,7 +13,12 @@ var queueCmd = &cobra.Command{
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		queue := &queuecmd.Command{}
-		queue.Run()
+		err := queue.Run()
+		if err != nil {
+			fmt.Println(err)
+		} else {
+			fmt.Println("Down .")
+		}
 	},
 }
 
