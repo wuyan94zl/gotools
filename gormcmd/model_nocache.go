@@ -16,8 +16,6 @@ import (
 	"gorm.io/gorm"
 )
 
-var NotFoundErr = errors.New("数据不存在")
-
 {{.struct}}
 
 type (
@@ -64,7 +62,7 @@ func (m *default{{.StructName}}Model) empty(info *{{.StructName}}, err error) (*
 	if info.ID != 0 {
 		return info, nil
 	}
-	return nil, NotFoundErr
+	return nil, gorm.ErrRecordNotFound
 }
 `
 

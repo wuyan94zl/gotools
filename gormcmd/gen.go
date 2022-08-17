@@ -39,7 +39,7 @@ func (c *Command) Run() error {
 	if err != nil {
 		return err
 	}
-	c.packageName = structData.Package
+	c.packageName = filepath.Base(VarStringDir)
 	c.structData = structData.StructCode[0].Code
 	c.structName = structData.StructCode[0].Table
 	c.wd = wd

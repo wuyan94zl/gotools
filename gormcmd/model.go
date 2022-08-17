@@ -84,7 +84,7 @@ func (m *default{{.StructName}}Model) empty(info *{{.StructName}}, err error) (*
 	if info.ID != 0 {
 		return info, nil
 	}
-	return nil, model.Notfound
+	return nil, gorm.ErrRecordNotFound
 }
 `
 

@@ -3,7 +3,6 @@ package model
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"math/rand"
 	"sync"
 	"time"
@@ -13,7 +12,6 @@ import (
 )
 
 var (
-	Notfound       = errors.New("数据不存在")
 	NotFoundExpire = time.Second * 5
 	CacheExpire    = 86400
 )
@@ -30,7 +28,7 @@ func (b *BashModel) CacheFirst(ctx context.Context, info interface{}, fn func() 
 	case "":
 		err := fn()
 		switch err {
-		case Notfound:
+		case gorm.ErrRecordNotFound:
 			b.setCache(ctx, key, "null", NotFoundExpire)
 		case nil:
 			strByte, _ := json.Marshal(info)
@@ -38,7 +36,7 @@ func (b *BashModel) CacheFirst(ctx context.Context, info interface{}, fn func() 
 		}
 		return err
 	case "null":
-		return Notfound
+		return gorm.ErrRecordNotFound
 	default:
 		return json.Unmarshal([]byte(result), info)
 	}
