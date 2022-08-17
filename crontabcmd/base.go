@@ -20,6 +20,7 @@ func init() {
 	{{.init}}
 }
 
+
 func newCron() *cron.Cron {
 	if Cron != nil {
 		Cron = cron.New(cron.WithSeconds())
@@ -27,8 +28,21 @@ func newCron() *cron.Cron {
 	return Cron
 }
 
-func Start() {
+type Instance struct {
+}
+
+func (q *Instance) Start() {
+	q.run()
+}
+
+func (q *Instance) Stop() {
+}
+
+func (q *Instance) run() {
 	Cron.Start()
+}
+func NewInstance() *Instance {
+	return &Instance{}
 }
 `
 
