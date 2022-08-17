@@ -6,6 +6,9 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](https://opensource.org/licenses/MIT)
 [![Gitter chat](https://badges.gitter.im/go-asynq/gitter.svg)](https://gitter.im/go-asynq/community)
 
+## 安装
+`go install github.com/wuyan94zl/gotools`
+
 ## crontab 定时任务代码生成
 > 一键生成定时任务功能包
 
@@ -109,10 +112,10 @@ type Params struct {
 }
 
 func Do(ctx context.Context, params Params) {
-	// todo 队列业务逻辑处理
+	// todo 队列消息消费业务逻辑处理
 }
 ```
-####  代码中发布队列
+####  代码中发布消息
 ```go
 // test.QueueKey 和 test.Params{} 为上面设置的数据
 // queue 队列入口包
