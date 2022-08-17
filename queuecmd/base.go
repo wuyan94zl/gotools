@@ -10,16 +10,12 @@ var tpl = `package {{.package}}
 
 import (
 	"encoding/json"
-	"fmt"
-
 	"github.com/hibiken/asynq"
-	//"github.com/wuyan94zl/gotools/queue/myqueue"
 	{{.import}}
 )
 
 func init() {
 	newMux()
-	//mux.HandleFunc(myqueue.QueueKey, myqueue.Handle)
 	{{.init}}
 }
 
@@ -33,18 +29,16 @@ func newMux() *asynq.ServeMux {
 	return mux
 }
 
-func NewInstance(addr string, port int, pwd string) *Instance {
+func NewInstance(host string, pwd string) *Instance {
 	queue = &Instance{
-		RedisAddr: addr,
-		RedisPort: port,
+		RedisHost: host,
 		RedisPwd:  pwd,
 	}
 	return queue
 }
 
 type Instance struct {
-	RedisAddr string
-	RedisPort int
+	RedisHost string
 	RedisPwd  string
 }
 
@@ -57,7 +51,7 @@ func (q *Instance) Stop() {
 
 func (q *Instance) run() {
 	asy := asynq.NewServer(
-		asynq.RedisClientOpt{Addr: fmt.Sprintf("%s:%d", q.RedisAddr, q.RedisPort), Password: q.RedisPwd},
+		asynq.RedisClientOpt{Addr: q.RedisHost, Password: q.RedisPwd},
 		asynq.Config{
 			Concurrency: 10,
 			Queues: map[string]int{
@@ -76,7 +70,7 @@ func Add(queueKey string, params interface{}, option ...asynq.Option) {
 		return
 	}
 
-	client := asynq.NewClient(asynq.RedisClientOpt{Addr: fmt.Sprintf("%s:%d", queue.RedisAddr, queue.RedisPort), Password: queue.RedisPwd})
+	client := asynq.NewClient(asynq.RedisClientOpt{Addr: queue.RedisHost, Password: queue.RedisPwd})
 	defer client.Close()
 	client.Enqueue(task, option...)
 }
