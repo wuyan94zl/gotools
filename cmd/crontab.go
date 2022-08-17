@@ -9,7 +9,7 @@ import (
 // cronCmd represents the cron command
 var cronCmd = &cobra.Command{
 	Use:   "crontab",
-	Short: "create crontab script",
+	Short: "generating crontab original code",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		app := &crontabcmd.Command{}
@@ -23,6 +23,6 @@ var cronCmd = &cobra.Command{
 }
 
 func init() {
-	cronCmd.Flags().StringVarP(&crontabcmd.VarStringName, "name", "n", "", "")
+	cronCmd.Flags().StringVarP(&crontabcmd.VarStringName, "name", "n", "", "The crontab package name")
 	rootCmd.AddCommand(cronCmd)
 }

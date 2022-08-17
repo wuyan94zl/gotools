@@ -1,4 +1,4 @@
-package gorm
+package gormcmd
 
 import (
 	"github.com/wuyan94zl/sql2gorm/parser"

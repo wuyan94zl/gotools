@@ -9,7 +9,7 @@ import (
 // queueCmd represents the queue command
 var queueCmd = &cobra.Command{
 	Use:   "queue",
-	Short: "create queue script",
+	Short: "generating queue original code",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		queue := &queuecmd.Command{}
@@ -23,6 +23,6 @@ var queueCmd = &cobra.Command{
 }
 
 func init() {
-	queueCmd.Flags().StringVarP(&queuecmd.VarStringName, "name", "n", "", "定义队列名称")
+	queueCmd.Flags().StringVarP(&queuecmd.VarStringName, "name", "n", "", "The queue package name")
 	rootCmd.AddCommand(queueCmd)
 }
