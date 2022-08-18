@@ -36,8 +36,8 @@ func (c *Command) Run() error {
 	wd, _ := os.Getwd()
 	c.wd = wd
 
-	c.handlerName = getName(VarStringDir) + getName(VarStringUrl) + getName(VarStringName)
-	c.routeUrl = fmt.Sprintf("%s%s%s", getUrl(VarStringDir), getUrl(VarStringUrl), getUrl(VarStringName))[1:]
+	c.handlerName = getName(VarStringDir) + getName(formatUrl(VarStringUrl)) + getName(VarStringName)
+	c.routeUrl = fmt.Sprintf("%s%s%s", getUrl(VarStringDir), getUrl(VarStringName), getUrl(VarStringUrl))[1:]
 
 	c.dir = VarStringDir
 	c.method = VarStringMethod
@@ -82,4 +82,12 @@ func getUrl(str string) string {
 		return ""
 	}
 	return "/" + str
+}
+
+func formatUrl(str string) string {
+	i := strings.Index(str, ":")
+	if i != -1 {
+		return str[0:i]
+	}
+	return str
 }
