@@ -10,7 +10,6 @@ var noCacheModelTpl = `package {{.package}}
 
 import (
 	"context"
-	"errors"
 	"time"
 
 	"gorm.io/gorm"

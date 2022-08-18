@@ -1,9 +1,8 @@
 package storage
 
 import (
-	"crypto/md5"
 	"fmt"
-	"io"
+	"github.com/wuyan94zl/gotools/utils"
 	"math/rand"
 	"mime/multipart"
 	"net/http"
@@ -36,13 +35,6 @@ func (b *base) putParams(r *http.Request, fileField, toFilePath string, fileName
 func genFileName(name string) string {
 	rand.Seed(time.Now().UnixNano())
 	num := rand.Int63n(time.Now().UnixNano())
-	fileName := Md5ByString(fmt.Sprintf("%s%d", name, num))
+	fileName := utils.Md5ByString(fmt.Sprintf("%s%d", name, num))
 	return fmt.Sprintf("%s%s", fileName, filepath.Ext(name))
-}
-
-func Md5ByString(str string) string {
-	m := md5.New()
-	io.WriteString(m, str)
-	arr := m.Sum(nil)
-	return fmt.Sprintf("%x", arr)
 }
