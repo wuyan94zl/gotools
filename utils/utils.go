@@ -7,6 +7,7 @@ import (
 	"go/format"
 	"os"
 	"path/filepath"
+	"strings"
 	"text/template"
 )
 
@@ -107,4 +108,19 @@ func GetPackage() (string, error) {
 		return "", errors.New("执行位置错误")
 	}
 	return string(line)[7:], nil
+}
+
+func WriteInfile(filePath, code string) error {
+	fp, _ := os.Create(filePath)
+	defer fp.Close()
+	code = FormatCode(code)
+	_, err := fp.WriteString(code)
+	return err
+}
+
+func UpperOne(str string) string {
+	if len(str) == 0 {
+		return ""
+	}
+	return strings.ToUpper(str[0:1]) + str[1:]
 }

@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/wuyan94zl/gotools/utils"
 	"path/filepath"
-	"strings"
 )
 
 var handlerTpl = `package {{.package}}
@@ -49,10 +48,9 @@ func genHandler(c *Command) error {
 	typePackage := fmt.Sprintf("%s/%s", packageStr, "app/types")
 	logicPackage := fmt.Sprintf("%s/%s%s", packageStr, "app/logic", childDir)
 
-	fmt.Println(c.name, "name")
 	return utils.GenFileCover(utils.FileGenConfig{
 		Dir:          wd,
-		Filename:     c.name + ".go",
+		Filename:     VarStringName + ".go",
 		TemplateFile: handlerTpl,
 		Data: map[string]string{
 			"package":         filepath.Base(wd),
@@ -60,7 +58,7 @@ func genHandler(c *Command) error {
 			"logicPackageSrc": logicPackage,
 			"typePackage":     filepath.Base(typePackage),
 			"logicPackage":    filepath.Base(logicPackage),
-			"name":            strings.ToUpper(c.name[0:1]) + c.name[1:],
+			"name":            c.handlerName,
 		},
 	})
 }

@@ -25,5 +25,7 @@ var handlerCmd = &cobra.Command{
 func init() {
 	handlerCmd.Flags().StringVarP(&handlercmd.VarStringName, "name", "n", "", "The handler name")
 	handlerCmd.Flags().StringVarP(&handlercmd.VarStringDir, "dir", "d", "", "The handler path")
+	handlerCmd.Flags().StringVarP(&handlercmd.VarStringMethod, "method", "m", "", "The handler method")
+	handlerCmd.Flags().StringVarP(&handlercmd.VarStringUrl, "url", "u", "", "The handler uri")
 	rootCmd.AddCommand(handlerCmd)
 }

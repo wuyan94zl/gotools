@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/wuyan94zl/gotools/utils"
 	"path/filepath"
-	"strings"
 )
 
 var logicTpl = `package {{.package}}
@@ -30,16 +29,15 @@ func genLogic(c *Command) error {
 	wd := filepath.Join(c.wd, "logic", c.dir)
 	typePackage := fmt.Sprintf("%s/%s", packageStr, "app/types")
 
-	fmt.Println(c.name, "name")
 	return utils.GenFileCover(utils.FileGenConfig{
 		Dir:          wd,
-		Filename:     c.name + ".go",
+		Filename:     VarStringName + ".go",
 		TemplateFile: logicTpl,
 		Data: map[string]string{
 			"package":        filepath.Base(wd),
 			"typePackageSrc": typePackage,
 			"typePackage":    filepath.Base(typePackage),
-			"name":           strings.ToUpper(c.name[0:1]) + c.name[1:],
+			"name":           c.handlerName,
 		},
 	})
 }
