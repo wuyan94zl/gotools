@@ -41,17 +41,29 @@ func (c *Command) Run() error {
 
 	c.dir = VarStringDir
 	c.method = VarStringMethod
-	fmt.Println(c.handlerName, c.routeUrl, VarStringName, VarStringDir, VarStringMethod, VarStringUrl)
-	genRoute(c)
+
+	err := genRoute(c)
+	if err != nil {
+		return err
+	}
 
 	wd = filepath.Join(wd, "app")
 	c.wd = wd
 
-	genTypes(c)
+	err = genTypes(c)
+	if err != nil {
+		return err
+	}
 
-	genHandler(c)
+	err = genHandler(c)
+	if err != nil {
+		return err
+	}
 
-	genLogic(c)
+	err = genLogic(c)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }

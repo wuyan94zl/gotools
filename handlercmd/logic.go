@@ -14,9 +14,9 @@ import (
 	"{{.typePackageSrc}}"
 )
 
-func {{.name}}Logic(c *gin.Context, req *{{.typePackage}}.{{.name}}Request) (*{{.typePackage}}.{{.name}}Response, error) {
+func {{.name}}Logic(c *gin.Context, req *{{.typePackage}}.{{.handler}}Request) (*{{.typePackage}}.{{.handler}}Response, error) {
 	// todo logic code
-	return &{{.typePackage}}.{{.name}}Response{}, nil
+	return &{{.typePackage}}.{{.handler}}Response{}, nil
 }
 
 `
@@ -28,6 +28,10 @@ func genLogic(c *Command) error {
 	}
 	wd := filepath.Join(c.wd, "logic", c.dir)
 	typePackage := fmt.Sprintf("%s/%s", packageStr, "app/types")
+	name := c.handlerName
+	if c.dir != "" {
+		name = c.handlerName[len(c.dir):]
+	}
 
 	return utils.GenFileCover(utils.FileGenConfig{
 		Dir:          wd,
@@ -37,7 +41,8 @@ func genLogic(c *Command) error {
 			"package":        filepath.Base(wd),
 			"typePackageSrc": typePackage,
 			"typePackage":    filepath.Base(typePackage),
-			"name":           c.handlerName,
+			"name":           name,
+			"handler":        c.handlerName,
 		},
 	})
 }

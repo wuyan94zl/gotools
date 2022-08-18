@@ -40,16 +40,16 @@ func appendType(c *Command, filePath string) error {
 	}
 	fileStr := string(file)
 
-	requestStr := fmt.Sprintf("type %sRequest struct {}", c.handlerName)
+	requestStr := fmt.Sprintf("%sRequest", c.handlerName)
 	i := strings.Index(fileStr, requestStr)
 	if i == -1 {
-		fileStr = fmt.Sprintf("%s\n%s", fileStr, requestStr)
+		fileStr = fmt.Sprintf("%s\ntype %s struct {}\n", fileStr, requestStr)
 	}
 
-	responseStr := fmt.Sprintf("type %sResponse struct {}", c.handlerName)
+	responseStr := fmt.Sprintf("%sResponse", c.handlerName)
 	i = strings.Index(fileStr, responseStr)
 	if i == -1 {
-		fileStr = fmt.Sprintf("%s\n%s", fileStr, responseStr)
+		fileStr = fmt.Sprintf("%s\ntype %s struct {}", fileStr, responseStr)
 	}
 	return utils.WriteInfile(filePath, fileStr)
 }

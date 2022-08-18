@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/wuyan94zl/gotools/utils"
 	"path/filepath"
+	"strings"
 )
 
 var handlerTpl = `package {{.package}}
@@ -17,8 +18,8 @@ import (
 	"{{.logicPackageSrc}}"
 )
 
-func {{.name}}Handler(c *gin.Context) {
-	req := new({{.typePackage}}.{{.name}}Request)
+func {{.handler}}Handler(c *gin.Context) {
+	req := new({{.typePackage}}.{{.handler}}Request)
 	c.ShouldBindJSON(req)
 	validate := validator.New()
 	err := validate.StructCtx(c.Copy(), req)
@@ -47,10 +48,14 @@ func genHandler(c *Command) error {
 	}
 	typePackage := fmt.Sprintf("%s/%s", packageStr, "app/types")
 	logicPackage := fmt.Sprintf("%s/%s%s", packageStr, "app/logic", childDir)
+	name := c.handlerName
+	if c.dir != "" {
+		name = c.handlerName[len(c.dir):]
+	}
 
 	return utils.GenFileCover(utils.FileGenConfig{
 		Dir:          wd,
-		Filename:     VarStringName + ".go",
+		Filename:     strings.ToLower(c.handlerName) + ".go",
 		TemplateFile: handlerTpl,
 		Data: map[string]string{
 			"package":         filepath.Base(wd),
@@ -58,7 +63,8 @@ func genHandler(c *Command) error {
 			"logicPackageSrc": logicPackage,
 			"typePackage":     filepath.Base(typePackage),
 			"logicPackage":    filepath.Base(logicPackage),
-			"name":            c.handlerName,
+			"name":            name,
+			"handler":         c.handlerName,
 		},
 	})
 }
