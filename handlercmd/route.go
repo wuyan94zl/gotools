@@ -28,8 +28,8 @@ func genRoute(c *Command) error {
 func appendRouteRegister(c *Command) error {
 	wd, _ := os.Getwd()
 	filePath := filepath.Join(wd, "router", "route.go")
-	register := fmt.Sprintf("register%sHandler(app)", utils.UpperOne(VarStringDir))
-	return appendCode(filePath, register)
+	register := fmt.Sprintf("register%sHandler", utils.UpperOne(VarStringDir))
+	return appendCode(filePath, fmt.Sprintf("%s(app)", register))
 }
 
 func registerRoute(c *Command) error {

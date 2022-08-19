@@ -33,7 +33,7 @@ func genLogic(c *Command) error {
 		name = c.handlerName[len(c.dir):]
 	}
 
-	return utils.GenFileCover(utils.FileGenConfig{
+	return utils.GenFile(utils.FileGenConfig{
 		Dir:          wd,
 		Filename:     VarStringName + ".go",
 		TemplateFile: logicTpl,

@@ -53,7 +53,7 @@ func genHandler(c *Command) error {
 		name = c.handlerName[len(c.dir):]
 	}
 
-	return utils.GenFileCover(utils.FileGenConfig{
+	return utils.GenFile(utils.FileGenConfig{
 		Dir:          wd,
 		Filename:     strings.ToLower(c.handlerName) + ".go",
 		TemplateFile: handlerTpl,

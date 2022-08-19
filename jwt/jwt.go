@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/golang-jwt/jwt"
-	"github.com/spf13/viper"
 	"strings"
 	"time"
 )
@@ -28,7 +27,7 @@ func GenToken(c Config, data map[string]interface{}) (map[string]interface{}, er
 		},
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, customClaims)
-	tokenString, err := token.SignedString([]byte(viper.GetString("jwt.secretary")))
+	tokenString, err := token.SignedString([]byte(c.Secretary))
 	if err != nil {
 		return nil, err
 	}
