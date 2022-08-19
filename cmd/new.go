@@ -8,7 +8,7 @@ import (
 
 // cronCmd represents the cron command
 var newCmd = &cobra.Command{
-	Use:   "new",
+	Use:   "init",
 	Short: "Initialize the new project",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {

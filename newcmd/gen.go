@@ -1,6 +1,7 @@
 package newcmd
 
 import (
+	"errors"
 	"os"
 	"os/exec"
 )
@@ -15,6 +16,9 @@ type Command struct {
 }
 
 func (c *Command) Run() error {
+	if VarStringPackageName == "" {
+		return errors.New("--package value is required")
+	}
 	wd, _ := os.Getwd()
 	c.wd = wd
 	c.packageSrc = VarStringPackageName
