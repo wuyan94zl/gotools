@@ -3,11 +3,9 @@ package newcmd
 import (
 	"os"
 	"os/exec"
-	"path/filepath"
 )
 
 var (
-	VarStringName        string
 	VarStringPackageName string
 )
 
@@ -19,6 +17,7 @@ type Command struct {
 func (c *Command) Run() error {
 	wd, _ := os.Getwd()
 	c.wd = wd
+	c.packageSrc = VarStringPackageName
 
 	err := InitMod(c)
 	if err != nil {
@@ -41,26 +40,17 @@ func (c *Command) Run() error {
 	if err != nil {
 		return err
 	}
-	InitTidy(c)
-	return nil
+	return InitTidy()
 }
 
 func InitMod(c *Command) error {
-	initCmd := []string{"mod", "init"}
-	if VarStringPackageName != "" {
-		initCmd = append(initCmd, VarStringPackageName)
-		c.packageSrc = VarStringPackageName
-	} else {
-		c.packageSrc = filepath.Base(c.wd)
-	}
+	initCmd := []string{"mod", "init", c.packageSrc}
 	cmd := exec.Command("go", initCmd...)
-	_, err := cmd.Output()
-	return err
+	return cmd.Start()
 }
 
-func InitTidy(c *Command) error {
+func InitTidy() error {
 	initCmd := []string{"mod", "tidy"}
 	cmd := exec.Command("go", initCmd...)
-	_, err := cmd.Output()
-	return err
+	return cmd.Start()
 }

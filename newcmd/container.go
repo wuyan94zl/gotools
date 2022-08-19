@@ -117,7 +117,7 @@ func genContainerM(c *Command) error {
 	wd := filepath.Join(c.wd, "container")
 	return utils.GenFile(utils.FileGenConfig{
 		Dir:          wd,
-		Filename:     "kernel.go",
+		Filename:     "container.go",
 		TemplateFile: genContainerTpl,
 		Data:         map[string]string{},
 	})

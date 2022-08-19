@@ -41,7 +41,7 @@ func genConfigGo(c *Command) error {
 
 var genConfigYamlTpl = `Name: "example-api"
 Host: "0.0.0.0"
-Port: 8899
+Port: 8888
 
 Container:
   # 数据库

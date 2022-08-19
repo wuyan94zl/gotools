@@ -23,7 +23,6 @@ var newCmd = &cobra.Command{
 }
 
 func init() {
-	newCmd.Flags().StringVarP(&newcmd.VarStringName, "name", "n", "", "The project name")
 	newCmd.Flags().StringVarP(&newcmd.VarStringPackageName, "package", "p", "", "The main package name")
 	rootCmd.AddCommand(newCmd)
 }
