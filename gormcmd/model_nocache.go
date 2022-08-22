@@ -37,13 +37,13 @@ func new{{.StructName}}Model(gormDb *gorm.DB) *default{{.StructName}}Model {
 
 func (m *default{{.StructName}}Model) Insert(ctx context.Context, data *{{.StructName}}) (*{{.StructName}}, error) {
 	err := m.Conn.WithContext(ctx).Create(data).Error
-	return m.empty(data, err)
+	return data, err
 }
 
 func (m *default{{.StructName}}Model) First(ctx context.Context, id int64) (*{{.StructName}}, error) {
 	info := new({{.StructName}})
 	err := m.Conn.WithContext(ctx).Find(info, id).Error
-	return m.empty(info, err)
+	return info, err
 }
 
 func (m *default{{.StructName}}Model) Update(ctx context.Context, data *{{.StructName}}) error {
@@ -52,16 +52,6 @@ func (m *default{{.StructName}}Model) Update(ctx context.Context, data *{{.Struc
 
 func (m *default{{.StructName}}Model) Delete(ctx context.Context, id int64) error {
 	return m.Conn.WithContext(ctx).Where("id = ?", id).Delete(new({{.StructName}})).Error
-}
-
-func (m *default{{.StructName}}Model) empty(info *{{.StructName}}, err error) (*{{.StructName}}, error) {
-	if err != nil {
-		return nil, err
-	}
-	if info.ID != 0 {
-		return info, nil
-	}
-	return nil, gorm.ErrRecordNotFound
 }
 `
 

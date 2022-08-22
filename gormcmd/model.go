@@ -53,7 +53,6 @@ func (m *default{{.StructName}}Model) First(ctx context.Context, id int64) (*{{.
 	info := new({{.StructName}})
 	err := m.CacheFirst(ctx, info, func() error {
 		err := m.Conn.WithContext(ctx).Find(info, id).Error
-		_, err = m.empty(info, err)
 		return err
 	}, key)
 	return info, err
@@ -75,16 +74,6 @@ func (m *default{{.StructName}}Model) Delete(ctx context.Context, id int64) erro
 	return m.CacheDelete(ctx, func() error {
 		return m.Conn.WithContext(ctx).Delete(info, id).Error
 	}, key)
-}
-
-func (m *default{{.StructName}}Model) empty(info *{{.StructName}}, err error) (*{{.StructName}}, error) {
-	if err != nil {
-		return nil, err
-	}
-	if info.ID != 0 {
-		return info, nil
-	}
-	return nil, gorm.ErrRecordNotFound
 }
 `
 
