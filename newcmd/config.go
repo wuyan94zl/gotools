@@ -51,6 +51,9 @@ Container:
   Redis:
     Host: "localhost:6379"
     Pass: "123456"
+  Jwt:
+    Export: 86400
+    Secretary: "wuyan94zl"
 `
 
 func genConfigYaml(c *Command) error {

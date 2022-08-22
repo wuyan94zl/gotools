@@ -90,17 +90,20 @@ var genContainerTpl = `package container
 
 import (
 	"github.com/go-redis/redis/v9"
+	"github.com/wuyan94zl/gotools/jwt"
 	"gorm.io/gorm"
 )
 
 type Config struct {
 	DB        GormConfig
 	Redis     RedisConfig
+	Jwt		  jwt.Config
 }
 
 type Container struct {
 	DB        *gorm.DB
 	Redis     *redis.Client
+	Jwt       jwt.Config
 }
 
 func NewContainer(c Config) {
@@ -108,6 +111,7 @@ func NewContainer(c Config) {
 	container = &Container{
 		DB:        dbConn,
 		Redis:     redisConn,
+		Jwt:       c.Jwt,
 	}
 }
 
