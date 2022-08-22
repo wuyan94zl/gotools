@@ -10,7 +10,7 @@ type Client interface {
 
 var cli Client
 
-func NewInstance(c *config) {
+func newInstance(c *config) Client {
 	switch c.Store {
 	case "cos":
 		cli = newCosInstance(c)
@@ -21,9 +21,10 @@ func NewInstance(c *config) {
 	case "local":
 		cli = newLocalInstance(c)
 	}
+	return cli
 }
 
-func Parse(store string, maxFileSize int64, conf interface{}) {
+func Parse(store string, maxFileSize int64, conf interface{}) Client {
 	c := &config{
 		Store:       store,
 		maxFileSize: maxFileSize,
@@ -38,7 +39,7 @@ func Parse(store string, maxFileSize int64, conf interface{}) {
 	case "qn":
 		c.QN = conf.(QNConfig)
 	}
-	NewInstance(c)
+	return newInstance(c)
 }
 
 func Put(r *http.Request, fileField, toFilePath string, fileName ...string) (string, error) {
