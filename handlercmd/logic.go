@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/wuyan94zl/gotools/utils"
 	"path/filepath"
+	"strings"
 )
 
 var logicTpl = `package {{.package}}
@@ -32,10 +33,9 @@ func genLogic(c *Command) error {
 	if c.dir != "" {
 		name = c.handlerName[len(c.dir):]
 	}
-
 	return utils.GenFile(utils.FileGenConfig{
 		Dir:          wd,
-		Filename:     VarStringName + ".go",
+		Filename:     strings.ToLower(name) + ".go",
 		TemplateFile: logicTpl,
 		Data: map[string]string{
 			"package":        filepath.Base(wd),

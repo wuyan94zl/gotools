@@ -20,10 +20,10 @@ func (b *base) putParams(r *http.Request, fileField, toFilePath string, fileName
 		return "", nil, nil, err
 	}
 	file, handle, err := r.FormFile(fileField)
-	defer file.Close()
 	if err != nil {
 		return "", nil, nil, err
 	}
+	defer file.Close()
 	// 文件名处理
 	name := handle.Filename
 	if len(fileName) == 0 {
