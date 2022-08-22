@@ -29,7 +29,7 @@ func appendRouteRegister(c *Command) error {
 	wd, _ := os.Getwd()
 	filePath := filepath.Join(wd, "router", "route.go")
 	register := fmt.Sprintf("register%sHandler", utils.UpperOne(VarStringDir))
-	return appendCode(filePath, fmt.Sprintf("%s(app)", register))
+	return appendCode(filePath, register, "(app)")
 }
 
 func registerRoute(c *Command) error {
@@ -45,7 +45,7 @@ func registerRoute(c *Command) error {
 
 func appendRoute(c *Command, filePath string) error {
 	route := fmt.Sprintf("app.%s(\"%s\", handler.%sHandler)", c.method, c.routeUrl, c.handlerName)
-	return appendCode(filePath, route)
+	return appendCode(filePath, route, "")
 }
 
 var routeTpl = `package {{.package}}
@@ -87,7 +87,7 @@ func createRoute(c *Command) error {
 	})
 }
 
-func appendCode(filePath, code string) error {
+func appendCode(filePath, code string, ext string) error {
 	file, err := ioutil.ReadFile(filePath)
 	if err != nil {
 		return err
@@ -96,7 +96,7 @@ func appendCode(filePath, code string) error {
 	i := strings.Index(fileStr, code)
 	if i == -1 {
 		point := strings.Index(fileStr, "}")
-		fileStr := fmt.Sprintf("%s\n\t%s%s", fileStr[0:point-1], code, fileStr[point-1:])
+		fileStr := fmt.Sprintf("%s\n\t%s%s%s", fileStr[0:point-1], code, ext, fileStr[point-1:])
 		return utils.WriteInfile(filePath, fileStr)
 	}
 	return nil
