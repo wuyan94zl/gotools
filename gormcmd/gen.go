@@ -1,7 +1,6 @@
 package gormcmd
 
 import (
-	"fmt"
 	"github.com/wuyan94zl/sql2gorm/parser"
 	"io/ioutil"
 	"os"
@@ -55,7 +54,6 @@ func (c *Command) Run() error {
 	} else {
 		c.hasSoftDelete = "1"
 	}
-	fmt.Println(c)
 	if VarBoolCache {
 		if err := setGormModel(c); err != nil {
 			return err

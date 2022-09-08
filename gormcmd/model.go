@@ -52,7 +52,7 @@ func (m *default{{.StructName}}Model) First(ctx context.Context, id int64) (*{{.
 	key := fmt.Sprintf("%s%d", cacheKey, id)
 	info := new({{.StructName}})
 	err := m.CacheFirst(ctx, info, func() error {
-		{{if eq .hasSoftDelete "1"}}err := m.Conn.WithContext(ctx).Where("{{.deletedFiled}} > 0").First(info, id).Error{{else}}err := m.Conn.WithContext(ctx).First(info, id).Error{{end}}
+		{{if eq .hasSoftDelete "1"}}err := m.Conn.WithContext(ctx).Where("{{.deletedFiled}} = 0").First(info, id).Error{{else}}err := m.Conn.WithContext(ctx).First(info, id).Error{{end}}
 		return err
 	}, key)
 	return info, err
@@ -72,7 +72,7 @@ func (m *default{{.StructName}}Model) Delete(ctx context.Context, id int64) erro
 		return err
 	}
 	return m.CacheDelete(ctx, func() error {
-		{{if eq .hasSoftDelete "1"}}return m.Conn.WithContext(ctx).Model(info).Update("{{.deletedFiled}}", 0).Error{{else}}return m.Conn.WithContext(ctx).Delete(info, id).Error{{end}}
+		{{if eq .hasSoftDelete "1"}}return m.Conn.WithContext(ctx).Model(info).Update("{{.deletedFiled}}", time.Now().Unix()).Error{{else}}return m.Conn.WithContext(ctx).Delete(info, id).Error{{end}}
 	}, key)
 }
 `
