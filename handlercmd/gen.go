@@ -36,7 +36,7 @@ func (c *Command) Run() error {
 	if VarStringMethod == "" {
 		return errors.New("handler method is required")
 	}
-	err := validateHandlerFlags()
+	err := validateFlags()
 	if err != nil {
 		return err
 	}
@@ -105,7 +105,7 @@ func formatUrl(str string) string {
 	return str
 }
 
-func validateHandlerFlags() error {
+func validateFlags() error {
 	utils.ToLowers(&VarStringDir, &VarStringName, &VarStringUrl, &VarStringParams)
 	ok, err := regexp.MatchString("^([a-z]+)$", VarStringDir)
 	if err != nil || !ok {
@@ -118,13 +118,17 @@ func validateHandlerFlags() error {
 	if VarStringMethod != "POST" && VarStringMethod != "GET" {
 		return errors.New("the --method parameter is invalid, only GET or POST")
 	}
-	ok, err = regexp.MatchString("^([a-z/]+)$", VarStringUrl)
-	if err != nil || !ok {
-		return errors.New("the --url parameter is invalid")
+	if VarStringUrl != "" {
+		ok, err = regexp.MatchString("^([a-z/]+)$", VarStringUrl)
+		if err != nil || !ok {
+			return errors.New("the --url parameter is invalid")
+		}
 	}
-	ok, err = regexp.MatchString("^([a-z:/]+)$", VarStringParams)
-	if err != nil || !ok {
-		return errors.New("the --params parameter is invalid")
+	if VarStringParams != "" {
+		ok, err = regexp.MatchString("^([a-z:/]+)$", VarStringParams)
+		if err != nil || !ok {
+			return errors.New("the --params parameter is invalid")
+		}
 	}
 	return nil
 }
