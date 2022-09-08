@@ -29,6 +29,7 @@ func init() {
 	handlerCmd.Flags().StringVarP(&handlercmd.VarStringName, "name", "n", "", "The handler name")
 	handlerCmd.Flags().StringVarP(&handlercmd.VarStringDir, "dir", "d", "", "The handler path")
 	handlerCmd.Flags().StringVarP(&handlercmd.VarStringMethod, "method", "m", "POST", "The handler method, default POST")
-	handlerCmd.Flags().StringVarP(&handlercmd.VarStringUrl, "url", "u", "", "The handler uri")
+	handlerCmd.Flags().StringVarP(&handlercmd.VarStringUrl, "url", "u", "", "The handler part url")
+	handlerCmd.Flags().StringVarP(&handlercmd.VarStringParams, "params", "p", "", "The handler url params")
 	rootCmd.AddCommand(handlerCmd)
 }

@@ -20,9 +20,9 @@ import (
 type (
 	{{.structName}}Model interface {
 		Insert(ctx context.Context, data *{{.StructName}}) (*{{.StructName}}, error)
-		First(ctx context.Context, id int64) (*{{.StructName}}, error)
+		First(ctx context.Context, id interface{}) (*{{.StructName}}, error)
 		Update(ctx context.Context, data *{{.StructName}}) error
-		Delete(ctx context.Context, id int64) error
+		Delete(ctx context.Context, id interface{}) error
 	}
 	default{{.StructName}}Model struct {
 		Conn *gorm.DB
@@ -40,7 +40,7 @@ func (m *default{{.StructName}}Model) Insert(ctx context.Context, data *{{.Struc
 	return data, err
 }
 
-func (m *default{{.StructName}}Model) First(ctx context.Context, id int64) (*{{.StructName}}, error) {
+func (m *default{{.StructName}}Model) First(ctx context.Context, id interface{}) (*{{.StructName}}, error) {
 	info := new({{.StructName}})
 	err := m.Conn.WithContext(ctx).Find(info, id).Error
 	return info, err
@@ -50,7 +50,7 @@ func (m *default{{.StructName}}Model) Update(ctx context.Context, data *{{.Struc
 	return m.Conn.WithContext(ctx).Save(data).Error
 }
 
-func (m *default{{.StructName}}Model) Delete(ctx context.Context, id int64) error {
+func (m *default{{.StructName}}Model) Delete(ctx context.Context, id interface{}) error {
 	return m.Conn.WithContext(ctx).Where("id = ?", id).Delete(new({{.StructName}})).Error
 }
 `

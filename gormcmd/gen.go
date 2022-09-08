@@ -3,10 +3,12 @@ package gormcmd
 import (
 	"errors"
 	"fmt"
+	"github.com/wuyan94zl/gotools/utils"
 	"github.com/wuyan94zl/sql2gorm/parser"
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 )
 
@@ -35,6 +37,10 @@ func (c *Command) Run() error {
 	}
 	if VarStringDir == "" {
 		return errors.New("gorm --dir is required")
+	}
+	err := validateGormFlags()
+	if err != nil {
+		return err
 	}
 	c.Command = fmt.Sprintf("%s --src %s --dir %s --cache %v --deleted %s", c.Command, VarStringSrc, VarStringDir, VarBoolCache, VarStringDeleted)
 
@@ -79,6 +85,23 @@ func (c *Command) Run() error {
 		if err := setGormNoCacheCustomModel(c); err != nil {
 			return err
 		}
+	}
+	return nil
+}
+
+func validateGormFlags() error {
+	utils.ToLowers(&VarStringDir, &VarStringDeleted)
+	ok, err := regexp.MatchString("^([a-z/]+)$", VarStringDir)
+	if err != nil || !ok {
+		return errors.New("the --dir parameter is invalid")
+	}
+	ok, err = regexp.MatchString("^([A-z/]+)$", VarStringSrc)
+	if err != nil || !ok {
+		return errors.New("the --src parameter is invalid")
+	}
+	ok, err = regexp.MatchString("^([a-z_]+)$", VarStringDeleted)
+	if err != nil || !ok {
+		return errors.New("the --deleted parameter is invalid")
 	}
 	return nil
 }

@@ -124,3 +124,9 @@ func UpperOne(str string) string {
 	}
 	return strings.ToUpper(str[0:1]) + str[1:]
 }
+
+func ToLowers(str ...*string) {
+	for _, v := range str {
+		strings.ToLower(*v)
+	}
+}

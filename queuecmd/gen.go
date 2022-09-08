@@ -3,8 +3,10 @@ package queuecmd
 import (
 	"errors"
 	"fmt"
+	"github.com/wuyan94zl/gotools/utils"
 	"os"
 	"path/filepath"
+	"regexp"
 )
 
 var (
@@ -21,6 +23,10 @@ func (c *Command) Run() error {
 	if VarStringName == "" {
 		return errors.New("queue name is required")
 	}
+	err := validateFlags()
+	if err != nil {
+		return err
+	}
 	c.Command = fmt.Sprintf("%s --name %s", c.Command, VarStringName)
 
 	wd, _ := os.Getwd()
@@ -33,5 +39,13 @@ func (c *Command) Run() error {
 	c.packageName = "queue"
 	c.wd = wd
 	genBase(c)
+	return nil
+}
+func validateFlags() error {
+	utils.ToLowers(&VarStringName)
+	ok, err := regexp.MatchString("^([a-z/]+)$", VarStringName)
+	if err != nil || !ok {
+		return errors.New("the --name parameter is invalid")
+	}
 	return nil
 }

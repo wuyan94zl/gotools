@@ -6,6 +6,7 @@ import (
 	"github.com/wuyan94zl/gotools/utils"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 )
 
@@ -14,6 +15,7 @@ var (
 	VarStringDir    string
 	VarStringMethod string
 	VarStringUrl    string
+	VarStringParams string
 )
 
 type Command struct {
@@ -34,20 +36,26 @@ func (c *Command) Run() error {
 	if VarStringMethod == "" {
 		return errors.New("handler method is required")
 	}
+	err := validateHandlerFlags()
+	if err != nil {
+		return err
+	}
 	c.Command = fmt.Sprintf("%s --dir %s --name %s --method %s", c.Command, VarStringDir, VarStringName, VarStringMethod)
 	if VarStringUrl != "" {
 		c.Command = fmt.Sprintf("%s --url %s", c.Command, VarStringUrl)
 	}
+	if VarStringParams != "" {
+		c.Command = fmt.Sprintf("%s --params %s", c.Command, VarStringParams)
+	}
 	wd, _ := os.Getwd()
 	c.wd = wd
-
 	c.handlerName = getName(VarStringDir) + getName(formatUrl(VarStringUrl)) + getName(VarStringName)
-	c.routeUrl = fmt.Sprintf("%s%s%s", getUrl(VarStringDir), getUrl(VarStringName), getUrl(VarStringUrl))[1:]
+	c.routeUrl = fmt.Sprintf("%s%s%s%s", getUrl(VarStringDir), getUrl(VarStringUrl), getUrl(VarStringName), getUrl(VarStringParams))[1:]
 
 	c.dir = VarStringDir
 	c.method = VarStringMethod
 
-	err := genRoute(c)
+	err = genRoute(c)
 	if err != nil {
 		return err
 	}
@@ -95,4 +103,28 @@ func formatUrl(str string) string {
 		return str[0:i]
 	}
 	return str
+}
+
+func validateHandlerFlags() error {
+	utils.ToLowers(&VarStringDir, &VarStringName, &VarStringUrl, &VarStringParams)
+	ok, err := regexp.MatchString("^([a-z]+)$", VarStringDir)
+	if err != nil || !ok {
+		return errors.New("the --dir parameter is invalid")
+	}
+	ok, err = regexp.MatchString("^([a-z]+)$", VarStringName)
+	if err != nil || !ok {
+		return errors.New("the --name parameter is invalid")
+	}
+	if VarStringMethod != "POST" && VarStringMethod != "GET" {
+		return errors.New("the --method parameter is invalid, only GET or POST")
+	}
+	ok, err = regexp.MatchString("^([a-z/]+)$", VarStringUrl)
+	if err != nil || !ok {
+		return errors.New("the --url parameter is invalid")
+	}
+	ok, err = regexp.MatchString("^([a-z:/]+)$", VarStringParams)
+	if err != nil || !ok {
+		return errors.New("the --params parameter is invalid")
+	}
+	return nil
 }
