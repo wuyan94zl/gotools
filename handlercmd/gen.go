@@ -17,6 +17,7 @@ var (
 )
 
 type Command struct {
+	Command     string
 	packageName string
 	wd          string
 	dir         string
@@ -32,6 +33,10 @@ func (c *Command) Run() error {
 	}
 	if VarStringMethod == "" {
 		return errors.New("handler method is required")
+	}
+	c.Command = fmt.Sprintf("%s --dir %s --name %s --method %s", c.Command, VarStringDir, VarStringName, VarStringMethod)
+	if VarStringUrl != "" {
+		c.Command = fmt.Sprintf("%s --url %s", c.Command, VarStringUrl)
 	}
 	wd, _ := os.Getwd()
 	c.wd = wd

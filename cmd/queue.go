@@ -12,11 +12,14 @@ var queueCmd = &cobra.Command{
 	Short: "generating queue original code",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		queue := &queuecmd.Command{}
+		queue := &queuecmd.Command{
+			Command: cmd.CommandPath(),
+		}
 		err := queue.Run()
 		if err != nil {
 			fmt.Println(err)
 		} else {
+			commandLog(queue.Command)
 			fmt.Println("Down .")
 		}
 	},

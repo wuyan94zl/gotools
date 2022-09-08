@@ -1,6 +1,8 @@
 package queuecmd
 
 import (
+	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
 )
@@ -10,11 +12,17 @@ var (
 )
 
 type Command struct {
+	Command     string
 	packageName string
 	wd          string
 }
 
 func (c *Command) Run() error {
+	if VarStringName == "" {
+		return errors.New("queue name is required")
+	}
+	c.Command = fmt.Sprintf("%s --name %s", c.Command, VarStringName)
+
 	wd, _ := os.Getwd()
 	wd = filepath.Join(wd, "queue")
 

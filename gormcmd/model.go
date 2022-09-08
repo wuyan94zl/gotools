@@ -48,8 +48,8 @@ func (m *default{{.StructName}}Model) Insert(ctx context.Context, data *{{.Struc
 	return data, err
 }
 
-func (m *default{{.StructName}}Model) First(ctx context.Context, id int64) (*{{.StructName}}, error) {
-	key := fmt.Sprintf("%s%d", cacheKey, id)
+func (m *default{{.StructName}}Model) First(ctx context.Context, id interface{}) (*{{.StructName}}, error) {
+	key := fmt.Sprintf("%s%v", cacheKey, id)
 	info := new({{.StructName}})
 	err := m.CacheFirst(ctx, info, func() error {
 		{{if eq .hasSoftDelete "1"}}err := m.Conn.WithContext(ctx).Where("{{.deletedFiled}} = 0").First(info, id).Error{{else}}err := m.Conn.WithContext(ctx).First(info, id).Error{{end}}
@@ -65,8 +65,8 @@ func (m *default{{.StructName}}Model) Update(ctx context.Context, data *{{.Struc
 	}, key)
 }
 
-func (m *default{{.StructName}}Model) Delete(ctx context.Context, id int64) error {
-	key := fmt.Sprintf("%s%d", cacheKey, id)
+func (m *default{{.StructName}}Model) Delete(ctx context.Context, id interface{}) error {
+	key := fmt.Sprintf("%s%v", cacheKey, id)
 	info, err := m.First(ctx, id)
 	if err != nil {
 		return err

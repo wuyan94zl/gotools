@@ -1,6 +1,8 @@
 package gormcmd
 
 import (
+	"errors"
+	"fmt"
 	"github.com/wuyan94zl/sql2gorm/parser"
 	"io/ioutil"
 	"os"
@@ -14,6 +16,7 @@ var VarStringDeleted string
 var VarBoolCache bool
 
 type Command struct {
+	Command       string
 	packageName   string
 	structName    string
 	structData    string
@@ -27,6 +30,14 @@ func (c *Command) GetDir() string {
 }
 
 func (c *Command) Run() error {
+	if VarStringSrc == "" {
+		return errors.New("gorm --src is required")
+	}
+	if VarStringDir == "" {
+		return errors.New("gorm --dir is required")
+	}
+	c.Command = fmt.Sprintf("%s --src %s --dir %s --cache %v --deleted %s", c.Command, VarStringSrc, VarStringDir, VarBoolCache, VarStringDeleted)
+
 	wd, _ := os.Getwd()
 	if VarStringDir != "." {
 		wd = filepath.Join(VarStringDir)
@@ -69,6 +80,5 @@ func (c *Command) Run() error {
 			return err
 		}
 	}
-
 	return nil
 }

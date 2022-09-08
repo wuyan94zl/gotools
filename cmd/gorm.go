@@ -12,11 +12,14 @@ var gormCmd = &cobra.Command{
 	Short: "mysql ddl to generating  gorm model original code",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		model := &gormcmd.Command{}
+		model := &gormcmd.Command{
+			Command: cmd.CommandPath(),
+		}
 		err := model.Run()
 		if err != nil {
 			fmt.Println(err)
 		} else {
+			commandLog(model.Command)
 			fmt.Println("Down .")
 		}
 	},

@@ -12,11 +12,14 @@ var cronCmd = &cobra.Command{
 	Short: "generating crontab original code",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		app := &crontabcmd.Command{}
+		app := &crontabcmd.Command{
+			Command: cmd.CommandPath(),
+		}
 		err := app.Run()
 		if err != nil {
 			fmt.Println(err)
 		} else {
+			commandLog(app.Command)
 			fmt.Println("Down .")
 		}
 	},
