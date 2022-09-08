@@ -26,5 +26,6 @@ func init() {
 	gormCmd.Flags().StringVarP(&gormcmd.VarStringSrc, "src", "s", "", "The path or path globbing patterns of the ddl")
 	gormCmd.Flags().StringVarP(&gormcmd.VarStringDir, "dir", "d", "", "The generated path")
 	gormCmd.Flags().BoolVarP(&gormcmd.VarBoolCache, "cache", "c", false, "The model is set to cache")
+	gormCmd.Flags().StringVarP(&gormcmd.VarStringDeleted, "soft", "f", "deleted", "The model soft delete field")
 	rootCmd.AddCommand(gormCmd)
 }

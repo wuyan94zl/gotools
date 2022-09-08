@@ -1,21 +1,26 @@
 package gormcmd
 
 import (
+	"fmt"
 	"github.com/wuyan94zl/sql2gorm/parser"
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 var VarStringSrc string
 var VarStringDir string
+var VarStringDeleted string
 var VarBoolCache bool
 
 type Command struct {
-	packageName string
-	structName  string
-	structData  string
-	wd          string
+	packageName   string
+	structName    string
+	structData    string
+	deletedFiled  string
+	hasSoftDelete string
+	wd            string
 }
 
 func (c *Command) GetDir() string {
@@ -42,7 +47,15 @@ func (c *Command) Run() error {
 	c.packageName = filepath.Base(VarStringDir)
 	c.structData = structData.StructCode[0].Code
 	c.structName = structData.StructCode[0].Table
+	c.deletedFiled = VarStringDeleted
 	c.wd = wd
+	i := strings.Index(string(file), c.deletedFiled)
+	if i == -1 {
+		c.hasSoftDelete = "0"
+	} else {
+		c.hasSoftDelete = "1"
+	}
+	fmt.Println(c)
 	if VarBoolCache {
 		if err := setGormModel(c); err != nil {
 			return err

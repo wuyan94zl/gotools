@@ -52,7 +52,7 @@ func (m *default{{.StructName}}Model) First(ctx context.Context, id int64) (*{{.
 	key := fmt.Sprintf("%s%d", cacheKey, id)
 	info := new({{.StructName}})
 	err := m.CacheFirst(ctx, info, func() error {
-		err := m.Conn.WithContext(ctx).Find(info, id).Error
+		{{if eq .hasSoftDelete "1"}}err := m.Conn.WithContext(ctx).Where("{{.deletedFiled}} > 0").First(info, id).Error{{else}}err := m.Conn.WithContext(ctx).First(info, id).Error{{end}}
 		return err
 	}, key)
 	return info, err
@@ -72,21 +72,23 @@ func (m *default{{.StructName}}Model) Delete(ctx context.Context, id int64) erro
 		return err
 	}
 	return m.CacheDelete(ctx, func() error {
-		return m.Conn.WithContext(ctx).Delete(info, id).Error
+		{{if eq .hasSoftDelete "1"}}return m.Conn.WithContext(ctx).Model(info).Update("{{.deletedFiled}}", 0).Error{{else}}return m.Conn.WithContext(ctx).Delete(info, id).Error{{end}}
 	}, key)
 }
 `
 
 func setGormModel(data *Command) error {
-	err := utils.GenFile(utils.FileGenConfig{
+	err := utils.GenFileCover(utils.FileGenConfig{
 		Dir:          data.wd,
 		Filename:     "model_gen.go",
 		TemplateFile: modelTplCache,
 		Data: map[string]string{
-			"package":    data.packageName,
-			"struct":     data.structData,
-			"StructName": data.structName,
-			"structName": strings.ToLower(data.structName[:1]) + data.structName[1:],
+			"package":       data.packageName,
+			"struct":        data.structData,
+			"StructName":    data.structName,
+			"deletedFiled":  data.deletedFiled,
+			"hasSoftDelete": data.hasSoftDelete,
+			"structName":    strings.ToLower(data.structName[:1]) + data.structName[1:],
 		},
 	})
 	if err != nil {
