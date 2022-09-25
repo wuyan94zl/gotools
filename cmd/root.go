@@ -28,10 +28,10 @@ func Execute() {
 
 func commandLog(command string) error {
 	wd, _ := os.Getwd()
-	filePath := filepath.Join(wd, "command.log")
+	filePath := filepath.Join(wd, "gotools_cmd.log")
 	_, err := os.Stat(filePath)
 	if err != nil {
-		file, _, _ := utils.CreteFile(wd, "command.log")
+		file, _, _ := utils.CreteFile(wd, "gotools_cmd.log")
 		file.Close()
 	}
 	file, err := ioutil.ReadFile(filePath)

@@ -26,10 +26,11 @@ const (
 
 type (
 	{{.structName}}Model interface {
-		Insert(ctx context.Context, data *{{.StructName}}) (*{{.StructName}}, error)
+		Insert(ctx context.Context, info *{{.StructName}}) (*{{.StructName}}, error)
 		First(ctx context.Context, id interface{}) (*{{.StructName}}, error)
-		Update(ctx context.Context, data *{{.StructName}}) error
-		Delete(ctx context.Context, id interface{}) error
+		Update(ctx context.Context, info *{{.StructName}}) error
+		Delete(ctx context.Context, info *{{.StructName}}) error
+		{{if eq .hasSoftDelete "1"}}ForceDelete(ctx context.Context, info *{{.StructName}}) error{{end}}
 	}
 	default{{.StructName}}Model struct {
 		model.BashModel
@@ -43,9 +44,9 @@ func new{{.StructName}}Model(gormDb *gorm.DB, cache *redis.Client) *default{{.St
 	return m
 }
 
-func (m *default{{.StructName}}Model) Insert(ctx context.Context, data *{{.StructName}}) (*{{.StructName}}, error) {
-	err := m.Conn.WithContext(ctx).Create(data).Error
-	return data, err
+func (m *default{{.StructName}}Model) Insert(ctx context.Context, info *{{.StructName}}) (*{{.StructName}}, error) {
+	err := m.Conn.WithContext(ctx).Create(info).Error
+	return info, err
 }
 
 func (m *default{{.StructName}}Model) First(ctx context.Context, id interface{}) (*{{.StructName}}, error) {
@@ -58,23 +59,26 @@ func (m *default{{.StructName}}Model) First(ctx context.Context, id interface{})
 	return info, err
 }
 
-func (m *default{{.StructName}}Model) Update(ctx context.Context, data *{{.StructName}}) error {
-	key := fmt.Sprintf("%s%d", cacheKey, data.ID)
+func (m *default{{.StructName}}Model) Update(ctx context.Context, info *{{.StructName}}) error {
+	key := fmt.Sprintf("%s%d", cacheKey, info.ID)
 	return m.CacheUpdate(ctx, func() error {
-		return m.Conn.WithContext(ctx).Save(data).Error
+		return m.Conn.WithContext(ctx).Save(info).Error
 	}, key)
 }
 
-func (m *default{{.StructName}}Model) Delete(ctx context.Context, id interface{}) error {
-	key := fmt.Sprintf("%s%v", cacheKey, id)
-	info, err := m.First(ctx, id)
-	if err != nil {
-		return err
-	}
+func (m *default{{.StructName}}Model) Delete(ctx context.Context, info *{{.StructName}}) error {
+	key := fmt.Sprintf("%s%v", cacheKey, info.ID)
 	return m.CacheDelete(ctx, func() error {
-		{{if eq .hasSoftDelete "1"}}return m.Conn.WithContext(ctx).Model(info).Update("{{.deletedFiled}}", time.Now().Unix()).Error{{else}}return m.Conn.WithContext(ctx).Delete(info, id).Error{{end}}
+		{{if eq .hasSoftDelete "1"}}return m.Conn.WithContext(ctx).Model(info).Update("{{.deletedFiled}}", time.Now().Unix()).Error{{else}}return m.Conn.WithContext(ctx).Delete(info).Error{{end}}
 	}, key)
 }
+
+{{if eq .hasSoftDelete "1"}}func (m *default{{.StructName}}Model) ForceDelete(ctx context.Context, info *{{.StructName}}) error {
+	key := fmt.Sprintf("%s%v", cacheKey, info.ID)
+	return m.CacheDelete(ctx, func() error {
+		return m.Conn.WithContext(ctx).Delete(info).Error
+	}, key)
+}{{end}}
 `
 
 func setGormModel(data *Command) error {
@@ -86,9 +90,9 @@ func setGormModel(data *Command) error {
 			"package":       data.packageName,
 			"struct":        data.structData,
 			"StructName":    data.structName,
+			"structName":    strings.ToLower(data.structName[:1]) + data.structName[1:],
 			"deletedFiled":  data.deletedFiled,
 			"hasSoftDelete": data.hasSoftDelete,
-			"structName":    strings.ToLower(data.structName[:1]) + data.structName[1:],
 		},
 	})
 	if err != nil {

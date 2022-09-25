@@ -6,7 +6,11 @@ import (
 )
 
 func genContainer(c *Command) error {
-	err := genContainerConn(c)
+	err := genGormConn(c)
+	if err != nil {
+		return err
+	}
+	err = genRedisConn(c)
 	if err != nil {
 		return err
 	}
@@ -14,13 +18,12 @@ func genContainer(c *Command) error {
 	if err != nil {
 		return err
 	}
-	return genContainerM(c)
+	return genContainerMain(c)
 }
 
-var genContainerConnTpl = `package container
+var genGormConnTpl = `package conn
 
 import (
-	"github.com/go-redis/redis/v9"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -30,12 +33,7 @@ type GormConfig struct {
 	DataSource string
 }
 
-type RedisConfig struct {
-	Host string
-	Pass string
-}
-
-func dbConn(c GormConfig) *gorm.DB {
+func GormConn(c GormConfig) *gorm.DB {
 	gormDB, err := gorm.Open(mysql.New(mysql.Config{
 		DSN:                      c.DataSource,
 		DefaultStringSize:        256,
@@ -49,20 +47,46 @@ func dbConn(c GormConfig) *gorm.DB {
 	}
 	return gormDB
 }
-
-func redisConn(c RedisConfig) *redis.Client {
-	redisConn := redis.NewClient(&redis.Options{Addr: c.Host, Password: c.Pass})
-	return redisConn
-}
-
 `
 
-func genContainerConn(c *Command) error {
-	wd := filepath.Join(c.wd, "container")
+func genGormConn(c *Command) error {
+	wd := filepath.Join(c.wd, "container", "conn")
 	return utils.GenFile(utils.FileGenConfig{
 		Dir:          wd,
-		Filename:     "conn.go",
-		TemplateFile: genContainerConnTpl,
+		Filename:     "gorm.go",
+		TemplateFile: genGormConnTpl,
+		Data:         map[string]string{},
+	})
+}
+
+var genRedisConnTpl = `package conn
+
+import "github.com/go-redis/redis/v9"
+
+var redisConfig RedisConfig
+
+type RedisConfig struct {
+	Host string
+	Pass string
+}
+
+func RedisConn(c RedisConfig) *redis.Client {
+	redisConfig = c
+	return GetRedisConn()
+}
+
+func GetRedisConn() *redis.Client {
+	redisConn := redis.NewClient(&redis.Options{Addr: redisConfig.Host, Password: redisConfig.Pass})
+	return redisConn
+}
+`
+
+func genRedisConn(c *Command) error {
+	wd := filepath.Join(c.wd, "container", "conn")
+	return utils.GenFile(utils.FileGenConfig{
+		Dir:          wd,
+		Filename:     "redis.go",
+		TemplateFile: genRedisConnTpl,
 		Data:         map[string]string{},
 	})
 }
@@ -92,12 +116,14 @@ import (
 	"github.com/go-redis/redis/v9"
 	"github.com/wuyan94zl/gotools/jwt"
 	"gorm.io/gorm"
+
+	"{{.packageSrc}}/container/conn"
 )
 
 type Config struct {
-	DB        GormConfig
-	Redis     RedisConfig
-	Jwt		  jwt.Config
+	DB		conn.GormConfig
+	Redis	conn.RedisConfig
+	Jwt		jwt.Config
 }
 
 type Container struct {
@@ -107,9 +133,9 @@ type Container struct {
 }
 
 func NewContainer(c Config) {
-	dbConn, redisConn := dbConn(c.DB), redisConn(c.Redis)
+	gormConn, redisConn := conn.GormConn(c.DB), conn.RedisConn(c.Redis)
 	container = &Container{
-		DB:        dbConn,
+		DB:        gormConn,
 		Redis:     redisConn,
 		Jwt:       c.Jwt,
 	}
@@ -117,12 +143,14 @@ func NewContainer(c Config) {
 
 `
 
-func genContainerM(c *Command) error {
+func genContainerMain(c *Command) error {
 	wd := filepath.Join(c.wd, "container")
 	return utils.GenFile(utils.FileGenConfig{
 		Dir:          wd,
 		Filename:     "container.go",
 		TemplateFile: genContainerTpl,
-		Data:         map[string]string{},
+		Data: map[string]string{
+			"packageSrc": c.packageSrc,
+		},
 	})
 }

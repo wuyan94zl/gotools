@@ -42,7 +42,6 @@ func (c *Command) Run() error {
 	if err != nil {
 		return err
 	}
-	c.Command = fmt.Sprintf("%s --src %s --dir %s --cache %v --deleted %s", c.Command, VarStringSrc, VarStringDir, VarBoolCache, VarStringDeleted)
 
 	wd, _ := os.Getwd()
 	if VarStringDir != "." {
@@ -71,7 +70,9 @@ func (c *Command) Run() error {
 	} else {
 		c.hasSoftDelete = "1"
 	}
+	varC := ""
 	if VarBoolCache {
+		varC = "-c"
 		if err := setGormModel(c); err != nil {
 			return err
 		}
@@ -86,6 +87,7 @@ func (c *Command) Run() error {
 			return err
 		}
 	}
+	c.Command = fmt.Sprintf("%s --src %s --dir %s %s --deleted %s", c.Command, VarStringSrc, VarStringDir, varC, VarStringDeleted)
 	return nil
 }
 
@@ -95,7 +97,7 @@ func validateGormFlags() error {
 	if err != nil || !ok {
 		return errors.New("the --dir parameter is invalid")
 	}
-	ok, err = regexp.MatchString("^([A-z/]+)$", VarStringSrc)
+	ok, err = regexp.MatchString("^([A-z/.]+)$", VarStringSrc)
 	if err != nil || !ok {
 		return errors.New("the --src parameter is invalid")
 	}
