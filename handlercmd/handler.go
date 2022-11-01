@@ -11,7 +11,7 @@ var handlerTpl = `package {{.package}}
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/wuyan94zl/gotools/response"
+	"github.com/wuyan94zl/gotools/core/response"
 	"github.com/wuyan94zl/validator/v10"
 
 	"{{.typePackageSrc}}"

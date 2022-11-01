@@ -114,7 +114,7 @@ var genContainerTpl = `package container
 
 import (
 	"github.com/go-redis/redis/v9"
-	"github.com/wuyan94zl/gotools/jwt"
+	"github.com/wuyan94zl/gotools/core/jwt"
 	"gorm.io/gorm"
 
 	"{{.packageSrc}}/container/conn"

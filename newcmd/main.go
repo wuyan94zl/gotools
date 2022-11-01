@@ -12,7 +12,7 @@ import (
 	"{{.packageSrc}}/config"
 	"{{.packageSrc}}/container"
 	"{{.packageSrc}}/router"
-	"github.com/wuyan94zl/gotools/utils"
+	"github.com/wuyan94zl/gotools/core/utils"
 )
 
 func main() {

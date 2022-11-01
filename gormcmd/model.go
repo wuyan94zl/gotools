@@ -14,7 +14,7 @@ import (
 	"time"
 
 	"github.com/go-redis/redis/v9"
-	"github.com/wuyan94zl/gotools/model"
+	"github.com/wuyan94zl/gotools/core/model"
 	"gorm.io/gorm"
 )
 
