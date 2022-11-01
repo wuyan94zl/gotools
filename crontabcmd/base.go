@@ -2,7 +2,7 @@ package crontabcmd
 
 import (
 	"fmt"
-	"github.com/wuyan94zl/gotools/utils"
+	"github.com/wuyan94zl/gotools/core/utils"
 	"io/ioutil"
 )
 

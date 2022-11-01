@@ -3,7 +3,7 @@ package gormcmd
 import (
 	"errors"
 	"fmt"
-	"github.com/wuyan94zl/gotools/utils"
+	"github.com/wuyan94zl/gotools/core/utils"
 	"github.com/wuyan94zl/sql2gorm/parser"
 	"io/ioutil"
 	"os"

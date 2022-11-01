@@ -3,7 +3,7 @@ package queuecmd
 import (
 	"errors"
 	"fmt"
-	"github.com/wuyan94zl/gotools/utils"
+	"github.com/wuyan94zl/gotools/core/utils"
 	"os"
 	"path/filepath"
 	"regexp"

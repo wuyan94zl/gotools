@@ -3,7 +3,7 @@ package cmd
 import (
 	"fmt"
 	"github.com/spf13/cobra"
-	"github.com/wuyan94zl/gotools/utils"
+	"github.com/wuyan94zl/gotools/core/utils"
 	"io/ioutil"
 	"os"
 	"path/filepath"

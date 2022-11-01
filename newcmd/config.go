@@ -1,7 +1,7 @@
 package newcmd
 
 import (
-	"github.com/wuyan94zl/gotools/utils"
+	"github.com/wuyan94zl/gotools/core/utils"
 	"path/filepath"
 )
 

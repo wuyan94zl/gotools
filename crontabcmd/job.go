@@ -1,6 +1,8 @@
 package crontabcmd
 
-import "github.com/wuyan94zl/gotools/utils"
+import (
+	"github.com/wuyan94zl/gotools/core/utils"
+)
 
 var jobTpl = `package {{.package}}
 

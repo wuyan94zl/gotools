@@ -3,9 +3,10 @@ package jwt
 import (
 	"errors"
 	"fmt"
-	"github.com/golang-jwt/jwt"
 	"strings"
 	"time"
+
+	"github.com/golang-jwt/jwt"
 )
 
 type Config struct {
