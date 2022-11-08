@@ -1,4 +1,4 @@
-package handlercmd
+package apicmd
 
 import (
 	"fmt"
@@ -19,8 +19,8 @@ type {{.name}}Response struct{}
 
 func genTypes(c *Command) error {
 	fileName := "type_gen.go"
-	if VarStringDir != "" {
-		fileName = VarStringDir + ".go"
+	if c.dir != "" {
+		fileName = c.dirName + ".go"
 	}
 	filePath := filepath.Join(c.wd, "types", fileName)
 

@@ -1,4 +1,4 @@
-package handlercmd
+package apicmd
 
 import (
 	"fmt"
@@ -27,7 +27,7 @@ func {{.handler}}Handler(c *gin.Context) {
 		c.JSON(200, response.Error(500, err))
 		return
 	}
-	resp, err := {{.logicPackage}}.{{.name}}Logic(c, req)
+	resp, err := {{.logicPackage}}.New{{.LogicPackage}}(c).{{.name}}Logic(c, req)
 	if err != nil {
 		c.JSON(200, response.Error(500, err))
 		return
@@ -37,32 +37,26 @@ func {{.handler}}Handler(c *gin.Context) {
 `
 
 func genHandler(c *Command) error {
-	packageStr, err := utils.GetPackage()
-	if err != nil {
-		return err
-	}
 	wd := filepath.Join(c.wd, "handler")
 	childDir := ""
 	if c.dir != "" {
 		childDir = "/" + c.dir
 	}
-	typePackage := fmt.Sprintf("%s/%s", packageStr, "app/types")
-	logicPackage := fmt.Sprintf("%s/%s%s", packageStr, "app/logic", childDir)
-	name := c.handlerName
-	if c.dir != "" {
-		name = c.handlerName[len(c.dir):]
-	}
+	typePackage := fmt.Sprintf("%s/%s", c.projectPkg, "app/types")
+	logicPackage := fmt.Sprintf("%s/%s%s", c.projectPkg, "app/logic", childDir)
+	name := utils.UpperOne(c.name)
 
 	return utils.GenFile(utils.FileGenConfig{
 		Dir:          wd,
 		Filename:     strings.ToLower(c.handlerName) + ".go",
 		TemplateFile: handlerTpl,
 		Data: map[string]string{
-			"package":         filepath.Base(wd),
+			"package":         "handler",
 			"typePackageSrc":  typePackage,
 			"logicPackageSrc": logicPackage,
 			"typePackage":     filepath.Base(typePackage),
 			"logicPackage":    filepath.Base(logicPackage),
+			"LogicPackage":    utils.UpperOne(filepath.Base(logicPackage)),
 			"name":            name,
 			"handler":         c.handlerName,
 		},

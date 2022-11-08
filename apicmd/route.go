@@ -1,4 +1,4 @@
-package handlercmd
+package apicmd
 
 import (
 	"fmt"
@@ -10,7 +10,7 @@ import (
 )
 
 func genRoute(c *Command) error {
-	if c.dir != "" {
+	if c.dirName != "" {
 		err := appendRouteRegister(c)
 		if err != nil {
 			return err
@@ -28,13 +28,12 @@ func genRoute(c *Command) error {
 func appendRouteRegister(c *Command) error {
 	wd, _ := os.Getwd()
 	filePath := filepath.Join(wd, "router", "route.go")
-	register := fmt.Sprintf("register%sHandler", utils.UpperOne(VarStringDir))
+	register := fmt.Sprintf("register%sHandler", c.routeReg)
 	return appendCode(filePath, register, "(app)")
 }
 
 func registerRoute(c *Command) error {
-	wd, _ := os.Getwd()
-	filePath := filepath.Join(wd, "router", c.dir+".go")
+	filePath := filepath.Join(c.wd, "router", c.dirName+".go")
 	_, err := os.Stat(filePath)
 	if err == nil {
 		return appendRoute(c, filePath)
@@ -52,37 +51,30 @@ var routeTpl = `package {{.package}}
 
 import (
 	"github.com/gin-gonic/gin"
-	"{{.handlerSrc}}"
+	"{{.handlerPkgSrc}}"
 )
 
-func register{{.dir}}Handler(app *gin.RouterGroup) {
+func register{{.routeReg}}Handler(app *gin.RouterGroup) {
 	app.{{.method}}("{{.routeUrl}}", {{.handler}}.{{.handlerName}}Handler)
 }
 
 `
 
 func createRoute(c *Command) error {
-	wd, _ := os.Getwd()
-	wd = filepath.Join(wd, "router")
-
-	packageStr, err := utils.GetPackage()
-	if err != nil {
-		return err
-	}
-
-	handlerSrc := fmt.Sprintf("%s/%s", packageStr, "app/handler")
+	wd := filepath.Join(c.wd, "router")
+	handlerPkgSrc := fmt.Sprintf("%s/%s", c.projectPkg, "app/handler")
 	return utils.GenFileCover(utils.FileGenConfig{
 		Dir:          wd,
-		Filename:     c.dir + ".go",
+		Filename:     c.dirName + ".go",
 		TemplateFile: routeTpl,
 		Data: map[string]string{
-			"package":     filepath.Base(wd),
-			"handlerSrc":  handlerSrc,
-			"handler":     filepath.Base(handlerSrc),
-			"handlerName": c.handlerName,
-			"method":      c.method,
-			"routeUrl":    c.routeUrl,
-			"dir":         utils.UpperOne(c.dir),
+			"package":       "router",
+			"handlerPkgSrc": handlerPkgSrc,
+			"handler":       "handler",
+			"handlerName":   c.handlerName,
+			"method":        c.method,
+			"routeUrl":      c.routeUrl,
+			"routeReg":      c.routeReg,
 		},
 	})
 }
