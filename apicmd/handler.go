@@ -18,7 +18,7 @@ import (
 	"{{.logicPackageSrc}}"
 )
 
-func {{.handler}}Handler(c *gin.Context) {
+func {{.name}}Handler(c *gin.Context) {
 	req := new({{.typePackage}}.{{.handler}}Request)
 	c.ShouldBindJSON(req)
 	validate := validator.New()
@@ -37,7 +37,7 @@ func {{.handler}}Handler(c *gin.Context) {
 `
 
 func genHandler(c *Command) error {
-	wd := filepath.Join(c.wd, "handler")
+	wd := filepath.Join(c.wd, "handler", c.dir)
 	childDir := ""
 	if c.dir != "" {
 		childDir = "/" + c.dir
@@ -48,10 +48,10 @@ func genHandler(c *Command) error {
 
 	return utils.GenFile(utils.FileGenConfig{
 		Dir:          wd,
-		Filename:     strings.ToLower(c.handlerName) + ".go",
+		Filename:     strings.ToLower(c.name) + ".go",
 		TemplateFile: handlerTpl,
 		Data: map[string]string{
-			"package":         "handler",
+			"package":         filepath.Base(c.dir),
 			"typePackageSrc":  typePackage,
 			"logicPackageSrc": logicPackage,
 			"typePackage":     filepath.Base(typePackage),

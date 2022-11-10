@@ -29,7 +29,7 @@ func appendRouteRegister(c *Command) error {
 	wd, _ := os.Getwd()
 	filePath := filepath.Join(wd, "router", "route.go")
 	register := fmt.Sprintf("register%sHandler", c.routeReg)
-	return appendCode(filePath, register, "(app)")
+	return appendCode(c, filePath, register, "(app)")
 }
 
 func registerRoute(c *Command) error {
@@ -43,8 +43,8 @@ func registerRoute(c *Command) error {
 }
 
 func appendRoute(c *Command, filePath string) error {
-	route := fmt.Sprintf("app.%s(\"%s\", handler.%sHandler)", c.method, c.routeUrl, c.handlerName)
-	return appendCode(filePath, route, "")
+	route := fmt.Sprintf("app.%s(\"%s\", %s.%sHandler)", c.method, c.routeUrl, filepath.Base(c.dir), utils.UpperOne(c.name))
+	return appendCode(c, filePath, route, "")
 }
 
 var routeTpl = `package {{.package}}
@@ -62,7 +62,7 @@ func register{{.routeReg}}Handler(app *gin.RouterGroup) {
 
 func createRoute(c *Command) error {
 	wd := filepath.Join(c.wd, "router")
-	handlerPkgSrc := fmt.Sprintf("%s/%s", c.projectPkg, "app/handler")
+	handlerPkgSrc := fmt.Sprintf("%s/app/handler/%s", c.projectPkg, c.dir)
 	return utils.GenFileCover(utils.FileGenConfig{
 		Dir:          wd,
 		Filename:     c.dirName + ".go",
@@ -70,8 +70,8 @@ func createRoute(c *Command) error {
 		Data: map[string]string{
 			"package":       "router",
 			"handlerPkgSrc": handlerPkgSrc,
-			"handler":       "handler",
-			"handlerName":   c.handlerName,
+			"handler":       filepath.Base(c.dir),
+			"handlerName":   utils.UpperOne(c.name),
 			"method":        c.method,
 			"routeUrl":      c.routeUrl,
 			"routeReg":      c.routeReg,
@@ -79,7 +79,7 @@ func createRoute(c *Command) error {
 	})
 }
 
-func appendCode(filePath, code string, ext string) error {
+func appendCode(c *Command, filePath, code string, ext string) error {
 	file, err := ioutil.ReadFile(filePath)
 	if err != nil {
 		return err
