@@ -84,7 +84,7 @@ func (c *Command) validateFlags() error {
 		return errors.New("api method is required")
 	}
 	utils.ToLowers(&VarStringDir, &VarStringName, &VarStringUrl, &VarStringParams)
-	ok, err := regexp.MatchString("^([a-z/]+)$", VarStringDir)
+	ok, err := regexp.MatchString("^([a-z]*)+(/*)$", VarStringDir)
 	if err != nil || !ok {
 		return errors.New("the --dir parameter is invalid")
 	}
@@ -96,7 +96,7 @@ func (c *Command) validateFlags() error {
 		return errors.New("the --method parameter is invalid, only GET or POST or PUT or DELETE")
 	}
 	if VarStringUrl != "" {
-		ok, err = regexp.MatchString("^([a-z/]+)$", VarStringUrl)
+		ok, err = regexp.MatchString("^([a-z]*)+(/*)$", VarStringUrl)
 		if err != nil || !ok {
 			return errors.New("the --url parameter is invalid")
 		}

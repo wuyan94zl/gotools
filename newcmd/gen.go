@@ -67,9 +67,9 @@ func InitTidy() error {
 
 func validateFlags() error {
 	utils.ToLowers(&VarStringPackageName)
-	ok, err := regexp.MatchString("^([a-z/]+)$", VarStringPackageName)
+	ok, err := regexp.MatchString("^([a-z]*)+(/*)+(.*)+(-*)$", VarStringPackageName)
 	if err != nil || !ok {
-		return errors.New("the --name parameter is invalid")
+		return errors.New("the --package parameter is invalid")
 	}
 	return nil
 }
