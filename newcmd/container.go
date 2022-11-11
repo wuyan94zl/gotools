@@ -132,12 +132,12 @@ type Container struct {
 	Jwt       jwt.Config
 }
 
-func NewContainer(c Config) {
-	gormConn, redisConn := conn.GormConn(c.DB), conn.RedisConn(c.Redis)
+func NewContainer(gorm conn.GormConfig, redis conn.RedisConfig, jwt jwt.Config) {
+	gormConn, redisConn := conn.GormConn(gorm), conn.RedisConn(redis)
 	container = &Container{
 		DB:        gormConn,
 		Redis:     redisConn,
-		Jwt:       c.Jwt,
+		Jwt:       jwt,
 	}
 }
 

@@ -16,10 +16,10 @@ import (
 )
 
 func main() {
-	c := new(config.Config)
+	c := config.GlobalConfig
 	utils.MustConfig("/config.yaml", c)
 
-	container.NewContainer(c.Container)
+	container.NewContainer(c.DB, c.Redis, c.Jwt)
 
 	app := gin.Default()
 	group := app.Group("")

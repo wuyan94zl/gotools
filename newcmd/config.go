@@ -16,14 +16,19 @@ func genConfig(c *Command) error {
 var genConfigGoTpl = `package config
 
 import (
-	"{{.packageSrc}}/container"
+	"github.com/wuyan94zl/gotools/core/jwt"
+	"{{.packageSrc}}/container/conn"
 )
 
+var GlobalConfig = new(Config)
+
 type Config struct {
-	Name      string
-	Host      string
-	Port      int
-	Container container.Config
+	Name   string
+	Host   string
+	Port   int
+	Jwt    jwt.Config
+	DB     conn.GormConfig
+	Redis  conn.RedisConfig
 }
 `
 
@@ -43,17 +48,17 @@ var genConfigYamlTpl = `Name: "example-api"
 Host: "0.0.0.0"
 Port: 8888
 
-Container:
-  # 数据库
-  DB:
-    DataSource: "root:123456@tcp(localhost:3306)/blogs?charset=utf8mb4&parseTime=true&loc=Asia%2FShanghai"
-  # redis
-  Redis:
-    Host: "localhost:6379"
-    Pass: "123456"
-  Jwt:
-    Export: 86400
-    Secretary: "wuyan94zl"
+# 数据库
+DB:
+  DataSource: "root:123456@tcp(localhost:3306)/blogs?charset=utf8mb4&parseTime=true&loc=Asia%2FShanghai"
+# redis
+Redis:
+  Host: "localhost:6379"
+  Pass: "123456"
+Jwt:
+  Export: 86400
+  Secretary: "wuyan94zl"
+
 `
 
 func genConfigYaml(c *Command) error {
