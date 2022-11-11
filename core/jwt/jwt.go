@@ -35,6 +35,7 @@ func GenToken(c Config, data map[string]interface{}) (map[string]interface{}, er
 	rlt := make(map[string]interface{})
 	rlt["expTime"] = expTime
 	rlt["token"] = tokenString
+	rlt["type"] = "Bearer"
 	return rlt, nil
 }
 

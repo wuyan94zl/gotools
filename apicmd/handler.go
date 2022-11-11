@@ -24,15 +24,15 @@ func {{.name}}Handler(c *gin.Context) {
 	validate := validator.New()
 	err := validate.StructCtx(c.Copy(), req)
 	if err != nil {
-		c.JSON(200, response.Error(500, err))
+		c.JSON(200, response.NewError(500, err.Error()))
 		return
 	}
 	resp, err := {{.logicPackage}}.New{{.LogicPackage}}(c).{{.name}}Logic(c, req)
 	if err != nil {
-		c.JSON(200, response.Error(500, err))
+		c.JSON(200, err)
 		return
 	}
-	c.JSON(200, response.Success(resp))
+	c.JSON(200, response.NewSuccess(resp))
 }
 `
 
