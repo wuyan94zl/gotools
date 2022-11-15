@@ -19,8 +19,8 @@ var queueCmd = &cobra.Command{
 		if err != nil {
 			fmt.Println(err)
 		} else {
-			commandLog(queue.Command)
-			fmt.Println("Down .")
+			//commandLog(queue.Command)
+			fmt.Println(queue.Command, "Down .")
 		}
 	},
 }

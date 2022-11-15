@@ -36,7 +36,7 @@ Command: 'gotools api -m GET -d api/user -n info -p :id'
 		if err != nil {
 			fmt.Println(err)
 		} else {
-			commandLog(app.Command)
+			//commandLog(app.Command)
 			fmt.Println(app.Command, "Down .")
 		}
 	},

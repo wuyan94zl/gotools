@@ -19,8 +19,8 @@ var gormCmd = &cobra.Command{
 		if err != nil {
 			fmt.Println(err)
 		} else {
-			commandLog(model.Command)
-			fmt.Println("Down .")
+			//commandLog(model.Command)
+			fmt.Println(model.Command, "Down .")
 		}
 	},
 }

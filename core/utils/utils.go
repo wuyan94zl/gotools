@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"bytes"
 	"errors"
-	"fmt"
 	"go/format"
 	"os"
 	"path/filepath"
@@ -99,8 +98,6 @@ func GetDir(method string, name string) string {
 }
 
 func GetPackage(wd string) (string, error) {
-	fmt.Println(os.Getwd())
-	fmt.Println(wd)
 	open, _ := os.Open(filepath.Join(wd, "go.mod"))
 	defer open.Close()
 

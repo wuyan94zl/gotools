@@ -19,8 +19,8 @@ var cronCmd = &cobra.Command{
 		if err != nil {
 			fmt.Println(err)
 		} else {
-			commandLog(app.Command)
-			fmt.Println("Down .")
+			//commandLog(app.Command)
+			fmt.Println(app.Command, "Down .")
 		}
 	},
 }
