@@ -54,7 +54,7 @@ import (
 	"{{.handlerPkgSrc}}"
 )
 
-func register{{.routeReg}}Handler(app *gin.RouterGroup) {
+func register{{.routeReg}}Handler(app gin.IRoutes) {
 	app.{{.method}}("{{.routeUrl}}", {{.handler}}.{{.handlerName}}Handler)
 }
 

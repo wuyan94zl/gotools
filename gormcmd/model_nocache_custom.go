@@ -3,39 +3,47 @@ package gormcmd
 import (
 	"fmt"
 	"github.com/wuyan94zl/gotools/core/utils"
+	"path/filepath"
 	"strings"
 )
 
 var noCacheCustomModelTpl = `package {{.package}}
 
-import "gorm.io/gorm"
+import (
+	"gorm.io/gorm"
+	"{{.projectPkg}}/{{.modelPkg}}"
+)
 
 type (
 	{{.StructName}}Model interface {
-		{{.structName}}Model
+		{{.modelPkg}}.{{.StructName}}Model
 	}
 	custom{{.StructName}}Model struct {
-		*default{{.StructName}}Model
+		*{{.modelPkg}}.Default{{.StructName}}Model
 	}
 )
 
 func New{{.StructName}}Model(gormDb *gorm.DB) {{.StructName}}Model {
 	return &custom{{.StructName}}Model{
-		default{{.StructName}}Model: new{{.StructName}}Model(gormDb),
+		Default{{.StructName}}Model: {{.modelPkg}}.New{{.StructName}}Model(gormDb),
 	}
 }
 
 `
 
 func setGormNoCacheCustomModel(data *Command) error {
+	wd := filepath.Join(data.wd, VarStringDir)
+	modelPkg := filepath.Base(data.wd)
 	err := utils.GenFile(utils.FileGenConfig{
-		Dir:          data.wd,
-		Filename:     "model.go",
+		Dir:          wd,
+		Filename:     "custom.go",
 		TemplateFile: noCacheCustomModelTpl,
 		Data: map[string]string{
 			"package":    data.packageName,
+			"projectPkg": data.projectPkg,
 			"StructName": data.structName,
 			"structName": strings.ToLower(data.structName[:1]) + data.structName[1:],
+			"modelPkg":   modelPkg,
 		},
 	})
 	if err != nil {

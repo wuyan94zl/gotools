@@ -43,23 +43,23 @@ Command: 'gotools api -m GET -d api/user -n info -p :id'
 }
 
 func command() error {
-	command := exec.Command("gotools", "api", "-d", apicmd.VarStringDir, "-n", "create", "-m", "PUT", "-u", apicmd.VarStringUrl)
+	command := exec.Command("gotools", "api", "-d", apicmd.VarStringDir, "-n", "create", "-m", "PUT")
 	_, err := command.Output()
 	if err != nil {
 		return err
 	}
 
-	command = exec.Command("gotools", "api", "-d", apicmd.VarStringDir, "-n", "info", "-m", "GET", "-p", ":id", "-u", apicmd.VarStringUrl)
+	command = exec.Command("gotools", "api", "-d", apicmd.VarStringDir, "-n", "info", "-m", "GET", "-p", ":id")
 	_, err = command.Output()
 	if err != nil {
 		return err
 	}
-	command = exec.Command("gotools", "api", "-d", apicmd.VarStringDir, "-n", "update", "-m", "POST", "-p", ":id", "-u", apicmd.VarStringUrl)
+	command = exec.Command("gotools", "api", "-d", apicmd.VarStringDir, "-n", "update", "-m", "POST", "-p", ":id")
 	_, err = command.Output()
 	if err != nil {
 		return err
 	}
-	command = exec.Command("gotools", "api", "-d", apicmd.VarStringDir, "-n", "delete", "-m", "DELETE", "-p", ":id", "-u", apicmd.VarStringUrl)
+	command = exec.Command("gotools", "api", "-d", apicmd.VarStringDir, "-n", "delete", "-m", "DELETE", "-p", ":id")
 	_, err = command.Output()
 	if err != nil {
 		return err
@@ -71,7 +71,6 @@ func init() {
 	handlerCmd.Flags().StringVarP(&apicmd.VarStringName, "name", "n", "", "The name of the API")
 	handlerCmd.Flags().StringVarP(&apicmd.VarStringDir, "dir", "d", "", "The directory path to the API")
 	handlerCmd.Flags().StringVarP(&apicmd.VarStringMethod, "method", "m", "POST", "The method of the API, default POST")
-	handlerCmd.Flags().StringVarP(&apicmd.VarStringUrl, "url", "u", "", "The api part url")
 	handlerCmd.Flags().StringVarP(&apicmd.VarStringParams, "params", "p", "", "Route parameters contained in the api")
 	rootCmd.AddCommand(handlerCmd)
 }

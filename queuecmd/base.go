@@ -86,16 +86,12 @@ func addTask(queueKey string, params interface{}) (*asynq.Task, error) {
 `
 
 func genBase(c *Command) error {
-	packageStr, err := utils.GetPackage()
-	if err != nil {
-		return err
-	}
 	dir, _ := ioutil.ReadDir(c.wd)
 	importStr := ""
 	initStr := ""
 	for _, v := range dir {
 		if v.IsDir() == true {
-			importStr = fmt.Sprintf("%s\n\"%s/queue/%s\"", importStr, packageStr, v.Name())
+			importStr = fmt.Sprintf("%s\n\"%s/queue/%s\"", importStr, c.projectPkg, v.Name())
 			initStr = fmt.Sprintf("%s\nmux.HandleFunc(%s.QueueKey, %s.Handle)", initStr, v.Name(), v.Name())
 		}
 	}

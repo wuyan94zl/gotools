@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
+	"unicode"
 )
 
 var VarStringSrc string
@@ -19,6 +20,8 @@ var VarBoolCache bool
 
 type Command struct {
 	Command       string
+	projectPkg    string // 项目包名
+	tableName     string
 	packageName   string
 	structName    string
 	structData    string
@@ -44,9 +47,11 @@ func (c *Command) Run() error {
 	}
 
 	wd, _ := os.Getwd()
-	if VarStringDir != "." {
-		wd = filepath.Join(VarStringDir)
+	pkg, err := utils.GetPackage(filepath.Dir(wd))
+	if err != nil {
+		return err
 	}
+	c.projectPkg = pkg
 	abs, err := filepath.Abs(VarStringSrc)
 	if err != nil {
 		return err
@@ -62,6 +67,7 @@ func (c *Command) Run() error {
 	c.packageName = filepath.Base(VarStringDir)
 	c.structData = structData.StructCode[0].Code
 	c.structName = structData.StructCode[0].Table
+	c.tableName = nameToTableName(strings.ToLower(c.structName[:1]) + c.structName[1:])
 	c.deletedFiled = VarStringDeleted
 	c.wd = wd
 	i := strings.Index(string(file), c.deletedFiled)
@@ -106,4 +112,15 @@ func validateGormFlags() error {
 		return errors.New("the --deleted parameter is invalid")
 	}
 	return nil
+}
+
+func nameToTableName(str string) string {
+	newStr := ""
+	for i, v := range str {
+		if unicode.IsUpper(v) {
+			newStr += "_"
+		}
+		newStr += strings.ToLower(str[i : i+1])
+	}
+	return newStr
 }

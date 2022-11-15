@@ -8,13 +8,13 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
+	"unicode"
 )
 
 var (
 	VarStringName   string
 	VarStringDir    string
 	VarStringMethod string
-	VarStringUrl    string
 	VarStringParams string
 )
 
@@ -24,7 +24,6 @@ type Command struct {
 	name   string
 	method string
 	params string
-	url    string
 
 	projectPkg  string // 项目包名
 	wd          string // 执行目录
@@ -83,23 +82,17 @@ func (c *Command) validateFlags() error {
 	if VarStringMethod == "" {
 		return errors.New("api method is required")
 	}
-	utils.ToLowers(&VarStringDir, &VarStringName, &VarStringUrl, &VarStringParams)
+	utils.ToLowers(&VarStringDir, &VarStringParams)
 	ok, err := regexp.MatchString("^([a-z]*)+(/*)$", VarStringDir)
 	if err != nil || !ok {
 		return errors.New("the --dir parameter is invalid")
 	}
-	ok, err = regexp.MatchString("^([a-z]+)$", VarStringName)
+	ok, err = regexp.MatchString("^([A-z]+)$", VarStringName)
 	if err != nil || !ok {
 		return errors.New("the --name parameter is invalid")
 	}
 	if VarStringMethod != "POST" && VarStringMethod != "GET" && VarStringMethod != "PUT" && VarStringMethod != "DELETE" && VarStringMethod != "RESTFUL" {
 		return errors.New("the --method parameter is invalid, only GET or POST or PUT or DELETE")
-	}
-	if VarStringUrl != "" {
-		ok, err = regexp.MatchString("^([a-z]*)+(/*)$", VarStringUrl)
-		if err != nil || !ok {
-			return errors.New("the --url parameter is invalid")
-		}
 	}
 	if VarStringParams != "" {
 		ok, err = regexp.MatchString("^([a-z:/]+)$", VarStringParams)
@@ -116,26 +109,21 @@ func (c *Command) initParams() error {
 	c.name = VarStringName
 	c.method = VarStringMethod
 	c.params = VarStringParams
-	c.url = VarStringUrl
-
-	pkg, err := utils.GetPackage()
+	wd, _ := os.Getwd()
+	pkg, err := utils.GetPackage(wd)
 	if err != nil {
 		return err
 	}
 	c.projectPkg = pkg
-	if c.url != "" {
-		c.Command = fmt.Sprintf("%s --url %s", c.Command, c.url)
-	}
 	if c.params != "" {
 		c.Command = fmt.Sprintf("%s --params %s", c.Command, c.params)
 	}
 	c.Command = fmt.Sprintf("%s --dir %s --name %s --method %s", c.Command, VarStringDir, VarStringName, VarStringMethod)
-	wd, _ := os.Getwd()
 	c.wd = wd
 	c.dirName = strings.ToLower(getName(c.dir))
-	c.routeReg = getName(c.dir) + getName(formatUrl(c.url))
-	c.handlerName = getName(c.dir) + getName(formatUrl(c.url)) + getName(c.name)
-	c.routeUrl = fmt.Sprintf("%s%s%s%s", getUrl(VarStringDir), getUrl(VarStringUrl), getUrl(VarStringName), getUrl(VarStringParams))[1:]
+	c.routeReg = getName(c.dir)
+	c.handlerName = getName(c.dir) + getName(c.name)
+	c.routeUrl = fmt.Sprintf("%s%s%s", getUrl(VarStringDir), getUrl(nameToUrl(VarStringName)), getUrl(VarStringParams))[1:]
 
 	//fmt.Println("pkg", c.projectPkg, "dirname", c.dirName, "routerReg", c.routeReg, "handlerName", c.handlerName)
 	return nil
@@ -157,10 +145,13 @@ func getUrl(str string) string {
 	return "/" + str
 }
 
-func formatUrl(str string) string {
-	i := strings.Index(str, ":")
-	if i != -1 {
-		return str[0:i]
+func nameToUrl(str string) string {
+	newStr := ""
+	for i, v := range str {
+		if unicode.IsUpper(v) {
+			newStr += "/"
+		}
+		newStr += strings.ToLower(str[i : i+1])
 	}
-	return str
+	return newStr
 }

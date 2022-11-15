@@ -47,16 +47,12 @@ func NewInstance() *Instance {
 `
 
 func genBase(c *Command) error {
-	packageStr, err := utils.GetPackage()
-	if err != nil {
-		return err
-	}
 	dir, _ := ioutil.ReadDir(c.wd)
 	importStr := ""
 	initStr := ""
 	for _, v := range dir {
 		if v.IsDir() == true {
-			importStr = fmt.Sprintf("%s\n\"%s/crontab/%s\"", importStr, packageStr, v.Name())
+			importStr = fmt.Sprintf("%s\n\"%s/crontab/%s\"", importStr, c.projectPkg, v.Name())
 			initStr = fmt.Sprintf("%s\nCron.AddJob(%s.Spec, %s.NewJob())", initStr, v.Name(), v.Name())
 		}
 	}

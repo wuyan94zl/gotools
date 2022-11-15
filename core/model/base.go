@@ -72,5 +72,5 @@ func (b *BashModel) delCache(ctx context.Context, key string) {
 func (b *BashModel) setRandExpire(expire int) time.Duration {
 	rand.Seed(time.Now().UnixNano())
 	n := rand.Intn(3600)
-	return time.Duration(expire + n)
+	return time.Duration(expire+n) * time.Second
 }

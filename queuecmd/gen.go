@@ -15,6 +15,7 @@ var (
 
 type Command struct {
 	Command     string
+	projectPkg  string // 项目包名
 	packageName string
 	wd          string
 }
@@ -30,6 +31,10 @@ func (c *Command) Run() error {
 	c.Command = fmt.Sprintf("%s --name %s", c.Command, VarStringName)
 
 	wd, _ := os.Getwd()
+	c.projectPkg, err = utils.GetPackage(wd)
+	if err != nil {
+		return err
+	}
 	wd = filepath.Join(wd, "queue")
 
 	c.packageName = VarStringName
