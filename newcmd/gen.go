@@ -38,6 +38,10 @@ func (c *Command) Run() error {
 	if err != nil {
 		return err
 	}
+	err = genErrCode(c)
+	if err != nil {
+		return err
+	}
 	err = genContainer(c)
 	if err != nil {
 		return err

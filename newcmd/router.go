@@ -8,10 +8,12 @@ import (
 var genRouterTpl = `package router
 
 import (
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
 func RegisterHandlers(app *gin.RouterGroup) {
+	app.Use(cors.Default())
 }
 `
 
