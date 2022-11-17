@@ -35,6 +35,7 @@ type Command struct {
 	packageName string // 包名
 	PackageName string // 函数名
 	middleware  string // 中间件
+	isRequest   string // 是否有request参数
 }
 
 func (c *Command) Run() error {
@@ -123,8 +124,22 @@ func (c *Command) initParams() error {
 	c.dirName = strings.ToLower(getName(c.dir))
 	c.routeReg = getName(c.dir)
 	c.handlerName = getName(c.dir) + getName(c.name)
-	c.routeUrl = fmt.Sprintf("%s%s%s", getUrl(VarStringDir), getUrl(nameToUrl(VarStringName)), getUrl(VarStringParams))[1:]
-
+	if c.name == "create" && c.method == "POST" {
+		c.routeUrl = fmt.Sprintf("%s", getUrl(VarStringDir))[1:]
+	} else if c.name == "update" && c.method == "PUT" {
+		c.routeUrl = fmt.Sprintf("%s/:id", getUrl(VarStringDir))[1:]
+	} else if c.name == "delete" && c.method == "DELETE" {
+		c.routeUrl = fmt.Sprintf("%s/:id", getUrl(VarStringDir))[1:]
+	} else if c.name == "info" && c.method == "GET" {
+		c.routeUrl = fmt.Sprintf("%s/:id", getUrl(VarStringDir))[1:]
+	} else {
+		c.routeUrl = fmt.Sprintf("%s%s%s", getUrl(VarStringDir), getUrl(nameToUrl(VarStringName)), getUrl(VarStringParams))[1:]
+	}
+	if c.method == "GET" || c.method == "DELETE" {
+		c.isRequest = ""
+	} else {
+		c.isRequest = "true"
+	}
 	//fmt.Println("pkg", c.projectPkg, "dirname", c.dirName, "routerReg", c.routeReg, "handlerName", c.handlerName)
 	return nil
 }

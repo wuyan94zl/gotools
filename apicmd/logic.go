@@ -30,7 +30,7 @@ import (
 	"{{.typePackageSrc}}"
 )
 
-func (logic {{.Package}}) {{.name}}Logic(c *gin.Context{{if ne .method "GET"}}, req *{{.typePackage}}.{{.handler}}Request{{end}}) (*{{.typePackage}}.{{.handler}}Response, error) {
+func (logic {{.Package}}) {{.name}}Logic(c *gin.Context{{if .isRequest}}, req *{{.typePackage}}.{{.handler}}Request{{end}}) (*{{.typePackage}}.{{.handler}}Response, error) {
 	// todo logic code
 	return &{{.typePackage}}.{{.handler}}Response{}, nil
 }
@@ -64,7 +64,7 @@ func genLogic(c *Command) error {
 			"typePackage":    filepath.Base(typePackage),
 			"name":           name,
 			"handler":        c.handlerName,
-			"method":         c.method,
+			"isRequest":      c.isRequest,
 		},
 	})
 }

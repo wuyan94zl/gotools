@@ -12,14 +12,14 @@ var handlerTpl = `package {{.package}}
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/wuyan94zl/gotools/core/response"
-	{{if ne .method "GET"}}"github.com/wuyan94zl/validator/v10"{{end}}
+	{{if .isRequest}}"github.com/wuyan94zl/validator/v10"{{end}}
 
-	{{if ne .method "GET"}}"{{.typePackageSrc}}"{{end}}
+	{{if .isRequest}}"{{.typePackageSrc}}"{{end}}
 	"{{.logicPackageSrc}}"
 )
 
 func {{.name}}Handler(c *gin.Context) {
-	{{if ne .method "GET"}}req := new({{.typePackage}}.{{.handler}}Request)
+	{{if .isRequest}}req := new({{.typePackage}}.{{.handler}}Request)
 	c.ShouldBindJSON(req)
 	validate := validator.New()
 	err := validate.StructCtx(c.Copy(), req)
@@ -62,7 +62,7 @@ func genHandler(c *Command) error {
 			"LogicPackage":    utils.UpperOne(filepath.Base(logicPackage)),
 			"name":            name,
 			"handler":         c.handlerName,
-			"method":          c.method,
+			"isRequest":       c.isRequest,
 		},
 	})
 }

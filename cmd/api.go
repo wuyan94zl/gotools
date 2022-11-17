@@ -43,23 +43,23 @@ Command: 'gotools api -m GET -d api/user -n info -p :id'
 }
 
 func command() error {
-	command := exec.Command("gotools", "api", "-d", apicmd.VarStringDir, "-n", "create", "-m", "PUT")
+	command := exec.Command("gotools", "api", "-d", apicmd.VarStringDir, "-n", "create", "-m", "POST")
 	_, err := command.Output()
 	if err != nil {
 		return err
 	}
 
-	command = exec.Command("gotools", "api", "-d", apicmd.VarStringDir, "-n", "info", "-m", "GET", "-p", ":id")
+	command = exec.Command("gotools", "api", "-d", apicmd.VarStringDir, "-n", "info", "-m", "GET")
 	_, err = command.Output()
 	if err != nil {
 		return err
 	}
-	command = exec.Command("gotools", "api", "-d", apicmd.VarStringDir, "-n", "update", "-m", "POST", "-p", ":id")
+	command = exec.Command("gotools", "api", "-d", apicmd.VarStringDir, "-n", "update", "-m", "PUT")
 	_, err = command.Output()
 	if err != nil {
 		return err
 	}
-	command = exec.Command("gotools", "api", "-d", apicmd.VarStringDir, "-n", "delete", "-m", "DELETE", "-p", ":id")
+	command = exec.Command("gotools", "api", "-d", apicmd.VarStringDir, "-n", "delete", "-m", "DELETE")
 	_, err = command.Output()
 	if err != nil {
 		return err

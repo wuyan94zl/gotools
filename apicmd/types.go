@@ -11,7 +11,7 @@ import (
 
 var typesTpl = `package {{.package}}
 
-{{if ne .method "GET"}}type {{.name}}Request struct{}{{end}}
+{{if .isRequest}}type {{.name}}Request struct{}{{end}}
 
 type {{.name}}Response struct{}
 
@@ -40,7 +40,7 @@ func appendType(c *Command, filePath string) error {
 	}
 	fileStr := string(file)
 
-	if c.method != "GET" {
+	if c.isRequest != "" {
 		requestStr := fmt.Sprintf("%sRequest", c.handlerName)
 		i := strings.Index(fileStr, requestStr)
 		if i == -1 {
@@ -62,8 +62,9 @@ func createType(c *Command, filePath string) error {
 		Filename:     filepath.Base(filePath),
 		TemplateFile: typesTpl,
 		Data: map[string]string{
-			"package": filepath.Base(filepath.Join(c.wd, "types")),
-			"name":    c.handlerName,
+			"package":   filepath.Base(filepath.Join(c.wd, "types")),
+			"name":      c.handlerName,
+			"isRequest": c.isRequest,
 		},
 	})
 }
