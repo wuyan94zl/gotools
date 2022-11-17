@@ -12,14 +12,14 @@ var handlerTpl = `package {{.package}}
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/wuyan94zl/gotools/core/response"
-	"github.com/wuyan94zl/validator/v10"
+	{{if ne .method "GET"}}"github.com/wuyan94zl/validator/v10"{{end}}
 
-	"{{.typePackageSrc}}"
+	{{if ne .method "GET"}}"{{.typePackageSrc}}"{{end}}
 	"{{.logicPackageSrc}}"
 )
 
 func {{.name}}Handler(c *gin.Context) {
-	req := new({{.typePackage}}.{{.handler}}Request)
+	{{if ne .method "GET"}}req := new({{.typePackage}}.{{.handler}}Request)
 	c.ShouldBindJSON(req)
 	validate := validator.New()
 	err := validate.StructCtx(c.Copy(), req)
@@ -27,7 +27,7 @@ func {{.name}}Handler(c *gin.Context) {
 		c.JSON(200, response.NewError(500, err.Error()))
 		return
 	}
-	resp, err := {{.logicPackage}}.New{{.LogicPackage}}(c).{{.name}}Logic(c, req)
+	resp, err := {{.logicPackage}}.New{{.LogicPackage}}(c).{{.name}}Logic(c, req){{else}}resp, err := {{.logicPackage}}.New{{.LogicPackage}}(c).{{.name}}Logic(c){{end}}
 	switch err {
 	case nil:
 		c.JSON(200, response.NewSuccess(resp))
@@ -62,6 +62,7 @@ func genHandler(c *Command) error {
 			"LogicPackage":    utils.UpperOne(filepath.Base(logicPackage)),
 			"name":            name,
 			"handler":         c.handlerName,
+			"method":          c.method,
 		},
 	})
 }

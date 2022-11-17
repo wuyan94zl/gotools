@@ -83,7 +83,7 @@ func (c *Command) validateFlags() error {
 		return errors.New("api method is required")
 	}
 	utils.ToLowers(&VarStringDir, &VarStringParams)
-	ok, err := regexp.MatchString("^([a-z]*)+(/*)$", VarStringDir)
+	ok, err := regexp.MatchString("^([a-z/]*)$", VarStringDir)
 	if err != nil || !ok {
 		return errors.New("the --dir parameter is invalid")
 	}

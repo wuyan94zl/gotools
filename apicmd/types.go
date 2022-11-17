@@ -11,7 +11,7 @@ import (
 
 var typesTpl = `package {{.package}}
 
-type {{.name}}Request struct{}
+{{if ne .method "GET"}}type {{.name}}Request struct{}{{end}}
 
 type {{.name}}Response struct{}
 
@@ -40,14 +40,16 @@ func appendType(c *Command, filePath string) error {
 	}
 	fileStr := string(file)
 
-	requestStr := fmt.Sprintf("%sRequest", c.handlerName)
-	i := strings.Index(fileStr, requestStr)
-	if i == -1 {
-		fileStr = fmt.Sprintf("%s\ntype %s struct {}\n", fileStr, requestStr)
+	if c.method != "GET" {
+		requestStr := fmt.Sprintf("%sRequest", c.handlerName)
+		i := strings.Index(fileStr, requestStr)
+		if i == -1 {
+			fileStr = fmt.Sprintf("%s\ntype %s struct {}\n", fileStr, requestStr)
+		}
 	}
 
 	responseStr := fmt.Sprintf("%sResponse", c.handlerName)
-	i = strings.Index(fileStr, responseStr)
+	i := strings.Index(fileStr, responseStr)
 	if i == -1 {
 		fileStr = fmt.Sprintf("%s\ntype %s struct {}", fileStr, responseStr)
 	}
