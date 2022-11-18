@@ -28,10 +28,10 @@ func {{.name}}Handler(c *gin.Context) {
 		return
 	}
 	resp, err := {{.logicPackage}}.New{{.LogicPackage}}(c).{{.name}}Logic(c, req){{else}}resp, err := {{.logicPackage}}.New{{.LogicPackage}}(c).{{.name}}Logic(c){{end}}
-	switch err {
+	switch err.(type) {
 	case nil:
 		c.JSON(200, response.NewSuccess(resp))
-	case response.Error{}:
+	case response.Error:
 		c.JSON(200, err)
 	default:
 		c.JSON(500, err)
