@@ -12,7 +12,8 @@ var noCacheModelTpl = `package {{.package}}
 import (
 	"context"
 	"time"
-
+	
+	"github.com/go-redis/redis/v9"
 	"gorm.io/gorm"
 )
 
@@ -32,12 +33,14 @@ type (
 	}
 	Default{{.StructName}}Model struct {
 		Conn *gorm.DB
+		Cache *redis.Client
 	}
 )
 
-func New{{.StructName}}Model(gormDb *gorm.DB) *Default{{.StructName}}Model {
+func New{{.StructName}}Model(gormDb *gorm.DB, cache *redis.Client) *Default{{.StructName}}Model {
 	model := &Default{{.StructName}}Model{}
 	model.Conn = gormDb
+	model.Cache = cache
 	return model
 }
 

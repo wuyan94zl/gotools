@@ -10,6 +10,7 @@ import (
 var noCacheCustomModelTpl = `package {{.package}}
 
 import (
+	"github.com/go-redis/redis/v9"
 	"gorm.io/gorm"
 	"{{.projectPkg}}/{{.modelPkg}}"
 )
@@ -23,9 +24,9 @@ type (
 	}
 )
 
-func New{{.StructName}}Model(gormDb *gorm.DB) {{.StructName}}Model {
+func New{{.StructName}}Model(gormDb *gorm.DB, cache *redis.Client) {{.StructName}}Model {
 	return &custom{{.StructName}}Model{
-		Default{{.StructName}}Model: {{.modelPkg}}.New{{.StructName}}Model(gormDb),
+		Default{{.StructName}}Model: {{.modelPkg}}.New{{.StructName}}Model(gormDb, cache),
 	}
 }
 
