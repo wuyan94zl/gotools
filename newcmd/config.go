@@ -17,6 +17,7 @@ var genConfigGoTpl = `package config
 
 import (
 	"github.com/wuyan94zl/gotools/core/jwt"
+	"github.com/wuyan94zl/gotools/core/logz"
 	"{{.packageSrc}}/container/conn"
 )
 
@@ -29,6 +30,7 @@ type Config struct {
 	Jwt    jwt.Config
 	DB     conn.GormConfig
 	Redis  conn.RedisConfig
+	Log    logz.Config
 }
 `
 
@@ -47,6 +49,13 @@ func genConfigGo(c *Command) error {
 var genConfigYamlTpl = `Name: "example-api"
 Host: "0.0.0.0"
 Port: 8888
+
+# 日志配置
+Log:
+  # Default：日志方式。 console:控制台日志打印，file：文件日志存储，kafka：写入kafka队列，需要配置elk相关组件
+  Default: "console"
+  Level: "info"    #  debug info error 等
+  Encoder: "plain" # plain json
 
 # 数据库
 DB:

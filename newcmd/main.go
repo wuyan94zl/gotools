@@ -12,13 +12,14 @@ import (
 	"{{.packageSrc}}/config"
 	"{{.packageSrc}}/container"
 	"{{.packageSrc}}/router"
+	"github.com/wuyan94zl/gotools/core/logz"
 	"github.com/wuyan94zl/gotools/core/utils"
 )
 
 func main() {
 	c := config.GlobalConfig
 	utils.MustConfig("/config.yaml", c)
-
+	logz.InitLog(c.Log)
 	container.NewContainer(c.DB, c.Redis, c.Jwt)
 
 	app := gin.Default()
