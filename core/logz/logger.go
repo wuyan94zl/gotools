@@ -2,7 +2,9 @@ package logz
 
 import (
 	"encoding/json"
+	"fmt"
 	"go.uber.org/zap"
+	"strings"
 )
 
 // Logger 全局 Logger 对象
@@ -64,27 +66,28 @@ func Fatal(moduleName string, fields ...zap.Field) {
 	Logger.Fatal(moduleName, fields...)
 }
 
-// DebugString 记录一条字符串类型的 debug 日志，调用示例：
-//
-//	logger.DebugString("SMS", "短信内容", string(result.RawResponse))
-func DebugString(moduleName, name, msg string) {
-	Logger.Debug(moduleName, zap.String(name, msg))
+func DebugAny(msg ...any) {
+	Logger.Debug(anyString(msg...))
 }
 
-func InfoString(moduleName, name, msg string) {
-	Logger.Info(moduleName, zap.String(name, msg))
+func InfoAny(msg ...any) {
+	Logger.Info(anyString(msg...))
 }
 
-func WarnString(moduleName, name, msg string) {
-	Logger.Warn(moduleName, zap.String(name, msg))
+func WarnAny(msg ...any) {
+	Logger.Warn(anyString(msg...))
 }
 
-func ErrorString(moduleName, name, msg string) {
-	Logger.Error(moduleName, zap.String(name, msg))
+func ErrorAny(msg ...any) {
+	Logger.Error(anyString(msg...))
 }
 
-func FatalString(moduleName, name, msg string) {
-	Logger.Fatal(moduleName, zap.String(name, msg))
+func FatalAny(msg ...any) {
+	Logger.Fatal(anyString(msg...))
+}
+
+func anyString(val ...any) string {
+	return fmt.Sprintf(strings.Repeat("%v ", len(val)), val...)
 }
 
 // DebugJSON 记录对象类型的 debug 日志，使用 json.Marshal 进行编码。调用示例：
