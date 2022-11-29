@@ -20,7 +20,8 @@ func main() {
 	c := config.GlobalConfig
 	utils.MustConfig("/config.yaml", c)
 	logz.InitLog(c.Log)
-	container.NewContainer(c.DB, c.Redis, c.Jwt)
+
+	container.NewContainer(c)
 
 	app := gin.Default()
 	group := app.Group("")

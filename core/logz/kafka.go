@@ -1,9 +1,11 @@
 package logz
 
 import (
+	"encoding/json"
 	"github.com/zeromicro/go-queue/kq"
 	"go.uber.org/zap/zapcore"
 	"strings"
+	"time"
 )
 
 type Kafka struct {
@@ -16,7 +18,11 @@ type KafkaLogWriter struct {
 }
 
 func (w *KafkaLogWriter) Write(p []byte) (n int, err error) {
-	if err := w.Pusher.Push(strings.TrimSpace(string(p))); err != nil {
+	data := make(map[string]interface{})
+	json.Unmarshal(p, &data)
+	data["@timestamp"] = time.Now()
+	marshal, _ := json.Marshal(data)
+	if err := w.Pusher.Push(strings.TrimSpace(string(marshal))); err != nil {
 		return 0, err
 	}
 	return len(p), nil
@@ -27,7 +33,8 @@ func (w *KafkaLogWriter) Sync() error {
 
 func getKafkaWriter(c Kafka) zapcore.WriteSyncer {
 	pusher := kq.NewPusher(c.Host, c.Topic)
-	return &KafkaLogWriter{
+	writer := &KafkaLogWriter{
 		Pusher: pusher,
 	}
+	return zapcore.AddSync(writer)
 }

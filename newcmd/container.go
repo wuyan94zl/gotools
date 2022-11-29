@@ -24,6 +24,7 @@ func genContainer(c *Command) error {
 var genGormConnTpl = `package conn
 
 import (
+	"github.com/wuyan94zl/gotools/core/logz"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -33,14 +34,25 @@ type GormConfig struct {
 	DataSource string
 }
 
-func GormConn(c GormConfig) *gorm.DB {
+func (c GormConfig) getLevel(level string) int {
+	switch level {
+	case "warn":
+		return 3
+	case "Error":
+		return 2
+	default:
+		return 4
+	}
+}
+
+func GormConn(c GormConfig, level string) *gorm.DB {
 	gormDB, err := gorm.Open(mysql.New(mysql.Config{
 		DSN:                      c.DataSource,
 		DefaultStringSize:        256,
 		DisableDatetimePrecision: true,
 		DontSupportRenameIndex:   true,
 	}), &gorm.Config{
-		Logger: logger.Default.LogMode(logger.Info),
+		Logger: logger.New(logz.NewGormWriter(), logger.Config{LogLevel: logger.LogLevel(c.getLevel(level))}),
 	})
 	if err != nil {
 		panic("mysql 链接错误")
@@ -55,7 +67,9 @@ func genGormConn(c *Command) error {
 		Dir:          wd,
 		Filename:     "gorm.go",
 		TemplateFile: genGormConnTpl,
-		Data:         map[string]string{},
+		Data: map[string]string{
+			"packageSrc": c.packageSrc,
+		},
 	})
 }
 
@@ -117,6 +131,7 @@ import (
 	"github.com/wuyan94zl/gotools/core/jwt"
 	"gorm.io/gorm"
 
+	"{{.packageSrc}}/config"	
 	"{{.packageSrc}}/container/conn"
 )
 
@@ -132,12 +147,12 @@ type Container struct {
 	Jwt       jwt.Config
 }
 
-func NewContainer(gorm conn.GormConfig, redis conn.RedisConfig, jwt jwt.Config) {
-	gormConn, redisConn := conn.GormConn(gorm), conn.RedisConn(redis)
+func NewContainer(c *config.Config) {
+	gormConn, redisConn := conn.GormConn(c.DB, c.Log.Level), conn.RedisConn(c.Redis)
 	container = &Container{
 		DB:        gormConn,
 		Redis:     redisConn,
-		Jwt:       jwt,
+		Jwt:       c.Jwt,
 	}
 }
 

@@ -78,5 +78,5 @@ func getEncoder(encoder string) zapcore.Encoder {
 
 // 自定义友好的时间格式
 func customTimeEncoder(t time.Time, enc zapcore.PrimitiveArrayEncoder) {
-	enc.AppendString(t.Format("2006-01-02 15:04:05"))
+	enc.AppendString(t.Format("2006-01-02T15:04:05.000Z"))
 }
