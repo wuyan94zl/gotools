@@ -64,6 +64,7 @@ DB:
 Redis:
   Host: "localhost:6379"
   Pass: "123456"
+  DB: 0
 Jwt:
   Export: 86400
   Secretary: "wuyan94zl"

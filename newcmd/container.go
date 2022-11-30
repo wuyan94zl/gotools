@@ -82,6 +82,7 @@ var redisConfig RedisConfig
 type RedisConfig struct {
 	Host string
 	Pass string
+	DB   int
 }
 
 func RedisConn(c RedisConfig) *redis.Client {
@@ -90,7 +91,7 @@ func RedisConn(c RedisConfig) *redis.Client {
 }
 
 func GetRedisConn() *redis.Client {
-	redisConn := redis.NewClient(&redis.Options{Addr: redisConfig.Host, Password: redisConfig.Pass})
+	redisConn := redis.NewClient(&redis.Options{Addr: redisConfig.Host, Password: redisConfig.Pass, DB: redisConfig.DB})
 	return redisConn
 }
 `

@@ -1,4 +1,4 @@
-# 一个简单的代码生成工具
+# 基于 gin（http） gorm（数据库） redis（缓存） zap（日志） 等完成基础web-api项目基准框架
 
 [![GoDoc](https://godoc.org/github.com/hibiken/asynq?status.svg)](https://godoc.org/github.com/hibiken/asynq)
 [![Go Report Card](https://goreportcard.com/badge/github.com/hibiken/asynq)](https://goreportcard.com/report/github.com/hibiken/asynq)
@@ -14,29 +14,46 @@
 
 ## 项目初始化
 `gotools init --package wuyan94zl/project`
+> --package 或 -p 表示项目包名
 
-### 目录结构
+## 初始目录结构
 ```
+common
+    |-- errcode
+        |-- code.go     # 全局错误码定义
 config
-    |-- config.go
+    |-- config.go       # 配置信息结构体
 container
-    |-- conn.go
+    |-- conn
+        |-- gorm.go     # gorm mysql连接实例
+        |-- redis.go    # redis 连接实例
     |-- kernal.go
-    |-- container.go
+    |-- container.go    # 全局容器
 router
-    |-- route.go
+    |-- route.go        # 路由
 main.go
-config.yaml
+config.yaml             # 配置文件和config结构体对应
 ```
+
+## api 生成
+> 生成api
+
+### 命令
+`gotools api --dir v1/user --name info --params :id --method GET`
+> --dir 表示api的文件目录 v1/user  
+> --name 表示api接口名称 info  
+> --params 表示路由参数 如：`:id`  
+> 以上参数生成路由为：v1/user/info/:id，逻辑实现代码目录为：app/logic/v1/user/info.go  
+> --method 表示api请求方式 GET POST DELETE PUT RESTFUL  
+
 
 ## crontab 定时任务代码生成
 > 一键生成定时任务功能包
 
-#### 命令
+### 命令
 `gotools crontab --name mycron`
-执行上面两个命令，就能生成以下文件目录代码
 
-#### 目录结构
+### 目录结构
 ```
 crontab
     |-- mycron
@@ -44,48 +61,26 @@ crontab
     |-- crontab.go             
 ```
 
-####  使用
+###  使用
 1、在main函数中使用
 ```go
 func main(){
-    go crontab.NewInstance().Start() 
-    // gin、beego等 启动http server
+	...
+    go crontab.NewInstance().Start()
+	...
 }
 ```
-2、在go-zero中使用
-```go
-group := service.NewServiceGroup() // go-zero service group
-group.Add(crontab.NewInstance()) // 添加 crontab service 到 group
-group.Start() // go-zero 启动 service group
-```
-####  生成初始代码
-```go
-package test
+### 实现
+编辑 `crontab/mycron/cronjob.go` 代码即可
 
-import (...)
-
-const Spec = "0 * * * * *" // todo 设置定时时间 秒 分 时 日 月 周
-
-func NewJob() *Job {
-	return &Job{}
-}
-
-type Job struct{}
-
-func (j *Job) Run() {
-	// todo 定时处理逻辑
-	fmt.Println("Execution per minute", time.Now().Format("2006-01-02 15:4:05"))
-}
-```
 
 ## queue 队列代码生成
 > 一键生成队列代码功能包
 
-####  命令
-`gotools queue --name myqueue`   
-执行上面两个命令，就能生成以下文件目录代码
+###  命令
+`gotools queue --name myqueue`
 
-####  目录结构
+###  目录结构
 ```
 queue
     |-- myqueue
@@ -93,78 +88,60 @@ queue
     |-- queue.go    
 ```
 
-####  使用
-1、在main函数中使用
+###  使用
+在main函数中使用
 ```go
 func main(){
-    go queue.NewInstance("127.0.0.1:6379", "123456").Start()
-    // gin、beego等 启动http server
+    ...
+	go queue.NewInstance("127.0.0.1:6379", "123456").Start()
+    ...
 }
 ```
-2、在go-zero中使用
+### 实现消费
+编辑 `queue/myqueue/myqueue.go` 代码
+
+### 发布消息
 ```go
-group := service.NewServiceGroup() // go-zero service group
-group.Add(queue.NewInstance("127.0.0.1:6379", "123456")) // 添加 crontab service 到 group
-group.Start() // go-zero 启动 service group
-```
-####  生成初始代码
-```go
-package test
-
-import (...)
-
-func Handle(ctx context.Context, t *asynq.Task) error {
-	params := Params{}
-	err := json.Unmarshal(t.Payload(), &params)
-	if err != nil {
-		return err
-	}
-	Do(ctx, params)
-	return nil
-}
-
-const QueueKey = "key" // todo 自定义队列key
-
-type Params struct {
-	// todo 自定义队列参数结构体
-}
-
-func Do(ctx context.Context, params Params) {
-	// todo 队列消息消费业务逻辑处理
-}
-```
-####  代码中发布消息
-```go
-// test.QueueKey 和 test.Params{} 为上面设置的数据
-// queue 队列入口包
-queue.Add(test.QueueKey, test.Params{})
+// myqueue.QueueKey 和 myqueue.Params{} 为上面设置的数据
+queue.Add(myqueue.QueueKey, myqueue.Params{})
 ```
 
-## sql gorm model 生成
+## sql to gorm model 生成
 > 根据sql一键生成gorm model代码包
 
-####  命令
-`gotools gorm --src user.sql --dir user --cache true`
+### 根目录下创建models目录
+> 以下所有命令在models目录下执行
+
+### 生成model
+1、创建user.sql  
+2、执行：`gotools gorm --src user.sql --dir user --cache true`
 
 ####  目录结构
 ```
 models
     |-- user
-        |-- model.go
-        |-- model_gen.go
+        |-- custom.go
+    |-- user_gen.go
     |-- user.sql
 ```
+
 ### 使用
+注入
+`container/container.go`
 ```go
-// cache model
-uModel := user.NewChatUsersModel(gormDB,redisCli)
+type Container struct{
+	...
+    UserModel      user.UsersModel // 增加代码
+	...
+}
 
-// no cache model
-// uModel := user.NewChatUsersModel(gormDB)
-
-uModel.Insert(ctx,user.Users{})
-uModel.First(ctx,id)
-uModel.Update(ctx,user.Users{})
-uModel.Delete(ctx,id)
-
+// NewContainer 增加UserModel 实例
+UserModel:      user.NewUsersModel(gormConn, redisConn), // 增加代码
+```
+使用
+```go
+container.Instance().UserModel.Insert(ctx,&models.Users{})
+container.Instance().UserModel.First(ctx,id)
+container.Instance().UserModel.Update(ctx,&models.Users{})
+container.Instance().UserModel.Delete(ctx,&models.Users{})
 ```
