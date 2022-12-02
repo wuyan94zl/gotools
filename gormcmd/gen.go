@@ -93,6 +93,7 @@ func (c *Command) Run() error {
 			return err
 		}
 	}
+	setMigrate(c)
 	c.Command = fmt.Sprintf("%s --src %s --dir %s %s --deleted %s", c.Command, VarStringSrc, VarStringDir, varC, VarStringDeleted)
 	return nil
 }
