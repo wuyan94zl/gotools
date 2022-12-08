@@ -60,7 +60,7 @@ func (c *Command) Run() error {
 	if err != nil {
 		return err
 	}
-	structData, err := parser.ParseSql(string(file))
+	structData, err := parser.ParseSql(string(file), parser.WithNoNullType(), parser.WithGormType())
 	if err != nil {
 		return err
 	}
