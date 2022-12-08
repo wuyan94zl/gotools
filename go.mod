@@ -11,7 +11,7 @@ require (
 	github.com/spf13/cobra v1.6.1
 	github.com/spf13/viper v1.14.0
 	github.com/tencentyun/cos-go-sdk-v5 v0.7.39
-	github.com/wuyan94zl/sql2gorm v0.0.0-20220816031836-e862c4f6afb0
+	github.com/wuyan94zl/sql2gorm v0.0.0-20221208093855-2305bc9dee37
 	github.com/zeromicro/go-queue v1.1.7
 	go.uber.org/zap v1.21.0
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0

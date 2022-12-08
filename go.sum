@@ -517,6 +517,8 @@ github.com/tklauser/numcpus v0.4.0/go.mod h1:1+UI3pD8NW14VMwdgJNJ1ESk2UnwhAnz5hM
 github.com/urfave/cli/v2 v2.3.0/go.mod h1:LJmUH05zAU44vOAcrfzZQKsZbVcdbOG8rtL3/XcUArI=
 github.com/wuyan94zl/sql2gorm v0.0.0-20220816031836-e862c4f6afb0 h1:+QoUeI+NGj3Hl/YEdl96BdqxamC2pSW9R9l9OiMiQD8=
 github.com/wuyan94zl/sql2gorm v0.0.0-20220816031836-e862c4f6afb0/go.mod h1:4vnLgTbg/nrExr5KfmuKY1KH9nrHrxlG7kaH9h/ga+Q=
+github.com/wuyan94zl/sql2gorm v0.0.0-20221208093855-2305bc9dee37 h1:D4sM6l1n3dCEaDcL+hEAhJrqstMiNqwS0XIXBKGy8r0=
+github.com/wuyan94zl/sql2gorm v0.0.0-20221208093855-2305bc9dee37/go.mod h1:4vnLgTbg/nrExr5KfmuKY1KH9nrHrxlG7kaH9h/ga+Q=
 github.com/xdg-go/pbkdf2 v1.0.0/go.mod h1:jrpuAogTd400dnrH08LKmI/xc1MbPOebTwRqcT5RDeI=
 github.com/xdg-go/scram v1.0.2/go.mod h1:1WAq6h33pAW+iRreB34OORO2Nf7qel3VV3fjBj+hCSs=
 github.com/xdg-go/scram v1.1.1/go.mod h1:RaEWvsqvNKKvBPvcKeFjrG2cJqOkHTiyTpzz23ni57g=
