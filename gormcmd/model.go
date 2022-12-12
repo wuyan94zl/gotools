@@ -12,8 +12,7 @@ var modelTplCache = `package {{.package}}
 import (
 	"context"
 	"fmt"
-	"time"
-
+	{{.structImport}}
 	"github.com/go-redis/redis/v9"
 	"github.com/wuyan94zl/gotools/core/model"
 	"gorm.io/gorm"
@@ -24,10 +23,6 @@ const (
 )
 
 {{.struct}}
-
-func (m *{{.StructName}}) TableName() string {
-	return "{{.tableName}}"
-}
 
 type (
 	{{.StructName}}Model interface {
@@ -97,6 +92,7 @@ func setGormModel(data *Command) error {
 			"struct":        data.structData,
 			"StructName":    data.structName,
 			"structName":    strings.ToLower(data.structName[:1]) + data.structName[1:],
+			"structImport":  data.structImport,
 			"tableName":     data.tableName,
 			"deletedFiled":  data.deletedFiled,
 			"hasSoftDelete": data.hasSoftDelete,

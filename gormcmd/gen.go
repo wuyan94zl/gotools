@@ -25,6 +25,7 @@ type Command struct {
 	packageName   string
 	structName    string
 	structData    string
+	structImport  string
 	deletedFiled  string
 	hasSoftDelete string
 	wd            string
@@ -65,6 +66,12 @@ func (c *Command) Run() error {
 		return err
 	}
 	c.packageName = filepath.Base(VarStringDir)
+	if len(structData.ImportPath) > 0 {
+		for _, v := range structData.ImportPath {
+			c.structImport = fmt.Sprintf("%s\"%s\"\n", c.structImport, v)
+		}
+	}
+
 	c.structData = structData.StructCode[0].Code
 	c.structName = structData.StructCode[0].Table
 	c.tableName = nameToTableName(strings.ToLower(c.structName[:1]) + c.structName[1:])

@@ -11,17 +11,12 @@ var noCacheModelTpl = `package {{.package}}
 
 import (
 	"context"
-	"time"
-	
+	{{.structImport}}
 	"github.com/go-redis/redis/v9"
 	"gorm.io/gorm"
 )
 
 {{.struct}}
-
-func (m *{{.StructName}}) TableName() string {
-	return "{{.tableName}}"
-}
 
 type (
 	{{.StructName}}Model interface {
@@ -79,6 +74,7 @@ func setGormNoCacheModel(data *Command) error {
 			"struct":        data.structData,
 			"StructName":    data.structName,
 			"structName":    strings.ToLower(data.structName[:1]) + data.structName[1:],
+			"structImport":  data.structImport,
 			"tableName":     data.tableName,
 			"deletedFiled":  data.deletedFiled,
 			"hasSoftDelete": data.hasSoftDelete,
