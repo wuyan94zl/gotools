@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"github.com/wuyan94zl/gotools/core/utils"
 	"io/ioutil"
+	"path/filepath"
 )
 
 var tpl = `package {{.package}}
 
 import (
-	"encoding/json"
 	"github.com/hibiken/asynq"
 	{{.import}}
 )
@@ -63,16 +63,46 @@ func (q *Instance) run() {
 	)
 	asy.Run(mux)
 }
+`
 
-func Add(queueKey string, params interface{}, option ...asynq.Option) {
+func serve(c *Command) error {
+	dir, _ := ioutil.ReadDir(c.wd)
+	importStr := ""
+	initStr := ""
+	for _, v := range dir {
+		if v.IsDir() == true && v.Name() != "serve" {
+			importStr = fmt.Sprintf("%s\n\"%s/queue/%s\"", importStr, c.projectPkg, v.Name())
+			initStr = fmt.Sprintf("%s\nmux.HandleFunc(%s.QueueKey, %s.Handle)", initStr, v.Name(), v.Name())
+		}
+	}
+	return utils.GenFileCover(utils.FileGenConfig{
+		Dir:          filepath.Join(c.wd, "serve"),
+		Filename:     "serve.go",
+		TemplateFile: tpl,
+		Data: map[string]string{
+			"package": "serve",
+			"import":  importStr,
+			"init":    initStr,
+		},
+	})
+}
+
+var tplQueueClient = `package queue
+
+import (
+	"encoding/json"
+	"github.com/hibiken/asynq"
+	{{.import}}
+)
+
+func Add(queueKey string, params interface{}, option ...asynq.Option) (*asynq.TaskInfo, error) {
 	task, err := addTask(queueKey, params)
 	if err != nil {
-		return
+		return nil, err
 	}
-
-	client := asynq.NewClient(asynq.RedisClientOpt{Addr: queue.RedisHost, Password: queue.RedisPwd})
+	client := asynq.NewClient(asynq.RedisClientOpt{Addr: config.GlobalConfig.Redis.Host, Password: config.GlobalConfig.Redis.Pass})
 	defer client.Close()
-	client.Enqueue(task, option...)
+	return client.Enqueue(task, option...)
 }
 
 func addTask(queueKey string, params interface{}) (*asynq.Task, error) {
@@ -82,27 +112,26 @@ func addTask(queueKey string, params interface{}) (*asynq.Task, error) {
 	}
 	return asynq.NewTask(queueKey, payload), nil
 }
-
 `
 
-func genBase(c *Command) error {
-	dir, _ := ioutil.ReadDir(c.wd)
-	importStr := ""
-	initStr := ""
-	for _, v := range dir {
-		if v.IsDir() == true {
-			importStr = fmt.Sprintf("%s\n\"%s/queue/%s\"", importStr, c.projectPkg, v.Name())
-			initStr = fmt.Sprintf("%s\nmux.HandleFunc(%s.QueueKey, %s.Handle)", initStr, v.Name(), v.Name())
-		}
-	}
-	return utils.GenFile(utils.FileGenConfig{
+func client(c *Command) error {
+	importStr := fmt.Sprintf("\"%s/config\"", c.projectPkg)
+	err := utils.GenFile(utils.FileGenConfig{
 		Dir:          c.wd,
 		Filename:     c.packageName + ".go",
-		TemplateFile: tpl,
+		TemplateFile: tplQueueClient,
 		Data: map[string]string{
 			"package": c.packageName,
 			"import":  importStr,
-			"init":    initStr,
 		},
 	})
+	return err
+}
+
+func genBase(c *Command) error {
+	err := client(c)
+	if err != nil {
+		return err
+	}
+	return serve(c)
 }
