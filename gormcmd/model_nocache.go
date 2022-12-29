@@ -46,7 +46,7 @@ func (m *Default{{.StructName}}Model) Insert(ctx context.Context, info *{{.Struc
 
 func (m *Default{{.StructName}}Model) First(ctx context.Context, id interface{}) (*{{.StructName}}, error) {
 	info := new({{.StructName}})
-	err := m.Conn.WithContext(ctx).Find(info, id).Error
+	err := m.Conn.WithContext(ctx).First(info, id).Error
 	return info, err
 }
 
