@@ -17,16 +17,16 @@ import (
 
 type (
 	{{.StructName}}Model interface {
-		{{.modelPkg}}.{{.StructName}}Model
+		{{.model}}.{{.StructName}}Model
 	}
 	custom{{.StructName}}Model struct {
-		*{{.modelPkg}}.Default{{.StructName}}Model
+		*{{.model}}.Default{{.StructName}}Model
 	}
 )
 
 func New{{.StructName}}Model(gormDb *gorm.DB, cache *redis.Client) {{.StructName}}Model {
 	return &custom{{.StructName}}Model{
-		Default{{.StructName}}Model: {{.modelPkg}}.New{{.StructName}}Model(gormDb, cache),
+		Default{{.StructName}}Model: {{.model}}.New{{.StructName}}Model(gormDb, cache),
 	}
 }
 
@@ -34,7 +34,7 @@ func New{{.StructName}}Model(gormDb *gorm.DB, cache *redis.Client) {{.StructName
 
 func setGormNoCacheCustomModel(data *Command) error {
 	wd := filepath.Join(data.wd, VarStringDir)
-	modelPkg := filepath.Base(data.wd)
+	modelPkg := filepath.Base(data.wd) + "/_gen"
 	err := utils.GenFile(utils.FileGenConfig{
 		Dir:          wd,
 		Filename:     "custom.go",
@@ -45,6 +45,7 @@ func setGormNoCacheCustomModel(data *Command) error {
 			"StructName": data.structName,
 			"structName": strings.ToLower(data.structName[:1]) + data.structName[1:],
 			"modelPkg":   modelPkg,
+			"model":      "_gen",
 		},
 	})
 	if err != nil {

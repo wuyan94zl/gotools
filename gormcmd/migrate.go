@@ -14,6 +14,8 @@ var migrateTplCache = `package {{.package}}
 import (
 	"github.com/wuyan94zl/gotools/core/logz"
 	"gorm.io/gorm"
+
+	"{{.projectPkg}}/models/types"
 )
 
 func AutoMigrate(gorm *gorm.DB) {
@@ -26,7 +28,7 @@ func AutoMigrate(gorm *gorm.DB) {
 
 func setTables() []interface{} {
 	var tables []interface{}
-	tables = append(tables, &{{.StructName}}{})
+	tables = append(tables, &types.{{.StructName}}{})
 	return tables
 }
 `
@@ -39,6 +41,7 @@ func createMigrate(c *Command) error {
 		Data: map[string]string{
 			"package":    filepath.Base(c.wd),
 			"StructName": c.structName,
+			"projectPkg": c.projectPkg,
 		},
 	})
 	if err != nil {
@@ -53,7 +56,7 @@ func appendMigrate(c *Command) error {
 		return err
 	}
 	fileStr := string(file)
-	code := fmt.Sprintf("tables = append(tables, &%s{})", c.structName)
+	code := fmt.Sprintf("tables = append(tables, &types.%s{})", c.structName)
 	i := strings.Index(fileStr, code)
 	if i == -1 {
 		point := strings.Index(fileStr, "return tables")
