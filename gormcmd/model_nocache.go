@@ -12,22 +12,22 @@ import (
 	"context"
 	"github.com/go-redis/redis/v9"
 	"gorm.io/gorm"
-	"{{.projectPkg}}/models/types"
+	"{{.projectPkg}}/models/tables"
 )
 
 type (
 	{{.StructName}}Model interface {
-		Insert(ctx context.Context, info *types.{{.modelName}}) (*types.{{.modelName}}, error)
-		First(ctx context.Context, id interface{}) (*types.{{.modelName}}, error)
-		Update(ctx context.Context, info *types.{{.modelName}}) error
-		Delete(ctx context.Context, info *types.{{.modelName}}) error
+		Insert(ctx context.Context, info *tables.{{.modelName}}) (*tables.{{.modelName}}, error)
+		First(ctx context.Context, id interface{}) (*tables.{{.modelName}}, error)
+		Update(ctx context.Context, info *tables.{{.modelName}}) error
+		Delete(ctx context.Context, info *tables.{{.modelName}}) error
 
 		Build(ctx context.Context) *Default{{.StructName}}Model
 		Where(query string, args ...interface{}) *Default{{.StructName}}Model
 		With(query string, args ...interface{}) *Default{{.StructName}}Model
-		One() (*types.{{.modelName}}, error)
-		List() ([]types.{{.modelName}}, error)
-		Paginate(page, pageSize int) ([]types.{{.modelName}}, error)
+		One() (*tables.{{.modelName}}, error)
+		List() ([]tables.{{.modelName}}, error)
+		Paginate(page, pageSize int) ([]tables.{{.modelName}}, int64, error)
 	}
 	Default{{.StructName}}Model struct {
 		Conn           *gorm.DB
@@ -43,22 +43,22 @@ func New{{.StructName}}Model(gormDb *gorm.DB, cache *redis.Client) *Default{{.St
 	return model
 }
 
-func (m *Default{{.StructName}}Model) Insert(ctx context.Context, info *types.{{.modelName}}) (*types.{{.modelName}}, error) {
+func (m *Default{{.StructName}}Model) Insert(ctx context.Context, info *tables.{{.modelName}}) (*tables.{{.modelName}}, error) {
 	err := m.Conn.WithContext(ctx).Create(info).Error
 	return info, err
 }
 
-func (m *Default{{.StructName}}Model) First(ctx context.Context, id interface{}) (*types.{{.modelName}}, error) {
-	info := new(types.{{.modelName}})
+func (m *Default{{.StructName}}Model) First(ctx context.Context, id interface{}) (*tables.{{.modelName}}, error) {
+	info := new(tables.{{.modelName}})
 	err := m.Conn.WithContext(ctx).Find(info, id).Error
 	return info, err
 }
 
-func (m *Default{{.StructName}}Model) Update(ctx context.Context, info *types.{{.modelName}}) error {
+func (m *Default{{.StructName}}Model) Update(ctx context.Context, info *tables.{{.modelName}}) error {
 	return m.Conn.WithContext(ctx).Save(info).Error
 }
 
-func (m *Default{{.StructName}}Model) Delete(ctx context.Context, info *types.{{.modelName}}) error {
+func (m *Default{{.StructName}}Model) Delete(ctx context.Context, info *tables.{{.modelName}}) error {
 	return m.Conn.WithContext(ctx).Delete(info).Error
 }
 
@@ -77,26 +77,31 @@ func (m *Default{{.StructName}}Model) With(query string, args ...interface{}) *D
 	return m
 }
 
-func (m *Default{{.StructName}}Model) One() (*types.{{.modelName}}, error) {
-	info := new(types.{{.modelName}})
+func (m *Default{{.StructName}}Model) One() (*tables.{{.modelName}}, error) {
+	info := new(tables.{{.modelName}})
 	err := m.BuildCondition.First(info).Error
 	return info, err
 }
 
-func (m *Default{{.StructName}}Model) List() ([]types.{{.modelName}}, error) {
-	var list []types.{{.modelName}}
+func (m *Default{{.StructName}}Model) List() ([]tables.{{.modelName}}, error) {
+	var list []tables.{{.modelName}}
 	err := m.BuildCondition.Find(&list).Error
 	return list, err
 }
 
-func (m *Default{{.StructName}}Model) Paginate(page, pageSize int) ([]types.{{.modelName}}, error) {
+func (m *Default{{.StructName}}Model) Paginate(page, pageSize int) ([]tables.{{.modelName}}, int64, error) {
+	var total int64
+	list := make([]tables.{{.modelName}}, 0)
+	err := m.BuildCondition.Count(&total).Error
+	if total == 0 {
+		return list, total, err
+	}
 	paginate := func(db *gorm.DB) *gorm.DB {
 		offset := (page - 1) * pageSize
 		return db.Offset(offset).Limit(pageSize)
 	}
-	var list []types.{{.modelName}}
-	err := m.BuildCondition.Scopes(paginate).Find(&list).Error
-	return list, err
+	err = m.BuildCondition.Scopes(paginate).Find(&list).Error
+	return list, total, err
 }
 
 `

@@ -15,21 +15,21 @@ import (
 	"github.com/wuyan94zl/gotools/core/logz"
 	"gorm.io/gorm"
 
-	"{{.projectPkg}}/models/types"
+	"{{.projectPkg}}/models/tables"
 )
 
 func AutoMigrate(gorm *gorm.DB) {
-	tables := setTables()
-	err := gorm.AutoMigrate(tables...)
+	tbs := setTables()
+	err := gorm.AutoMigrate(tbs...)
 	if err != nil {
 		logz.InfoAny("database tables auto migrate err：", err)
 	}
 }
 
 func setTables() []interface{} {
-	var tables []interface{}
-	tables = append(tables, &types.{{.StructName}}{})
-	return tables
+	var tbs []interface{}
+	tbs = append(tbs, &tables.{{.StructName}}{})
+	return tbs
 }
 `
 
@@ -56,10 +56,10 @@ func appendMigrate(c *Command) error {
 		return err
 	}
 	fileStr := string(file)
-	code := fmt.Sprintf("tables = append(tables, &types.%s{})", c.structName)
+	code := fmt.Sprintf("tbs = append(tbs, &tables.%s{})", c.structName)
 	i := strings.Index(fileStr, code)
 	if i == -1 {
-		point := strings.Index(fileStr, "return tables")
+		point := strings.Index(fileStr, "return tbs")
 		fileStr = fmt.Sprintf("%s\t%s\n%s", fileStr[0:point-1], code, fileStr[point-1:])
 		return utils.WriteInfile(filePath, fileStr)
 	}

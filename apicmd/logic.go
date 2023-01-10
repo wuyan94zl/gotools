@@ -16,8 +16,8 @@ import (
 type {{.Package}} struct {
 }
 
-func New{{.Package}}(c *gin.Context) {{.Package}} {
-	return {{.Package}}{}
+func New{{.Package}}(c *gin.Context) *{{.Package}} {
+	return &{{.Package}}{}
 }
 
 `
@@ -30,7 +30,7 @@ import (
 	"{{.typePackageSrc}}"
 )
 
-func (logic {{.Package}}) {{.name}}Logic(c *gin.Context{{if .isRequest}}, req *{{.typePackage}}.{{.handler}}Request{{end}}) (*{{.typePackage}}.{{.handler}}Response, error) {
+func (logic *{{.Package}}) {{.name}}Logic(c *gin.Context{{if .isRequest}}, req *{{.typePackage}}.{{.handler}}Request{{end}}) (*{{.typePackage}}.{{.handler}}Response, error) {
 	// todo logic code
 	return &{{.typePackage}}.{{.handler}}Response{}, nil
 }

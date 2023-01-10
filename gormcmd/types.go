@@ -22,7 +22,7 @@ import (
 `
 
 func createTypes(c *Command) error {
-	filePath := filepath.Join(c.wd, "types", strings.ToLower(c.structName)+".go")
+	filePath := filepath.Join(c.wd, "tables", strings.ToLower(c.structName)+".go")
 	_, err := os.Stat(filePath)
 	custom := `// edit the custom code below, never delete this line of code
 
@@ -37,11 +37,11 @@ type ` + c.structName + `Model struct {
 
 func createType(c *Command, customModel string) error {
 	err := utils.GenFileCover(utils.FileGenConfig{
-		Dir:          filepath.Join(c.wd, "types"),
+		Dir:          filepath.Join(c.wd, "tables"),
 		Filename:     strings.ToLower(c.structName) + ".go",
 		TemplateFile: typeTpl,
 		Data: map[string]string{
-			"package":      "types",
+			"package":      "tables",
 			"struct":       c.structData,
 			"structImport": c.structImport,
 			"structName":   c.structName,
