@@ -63,7 +63,7 @@ func (m *Default{{.StructName}}Model) Delete(ctx context.Context, info *tables.{
 }
 
 func (m *Default{{.StructName}}Model) Build(ctx context.Context) *Default{{.StructName}}Model {
-	m.BuildCondition = m.Conn.WithContext(ctx)
+	m.BuildCondition = m.Conn.WithContext(ctx).Model(&tables.{{.StructName}}Model{})
 	return m
 }
 
