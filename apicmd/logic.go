@@ -14,10 +14,11 @@ import (
 )
 
 type {{.Package}} struct {
+	ctx *gin.Context
 }
 
 func New{{.Package}}(c *gin.Context) *{{.Package}} {
-	return &{{.Package}}{}
+	return &{{.Package}}{ctx: c}
 }
 
 `
@@ -25,12 +26,10 @@ func New{{.Package}}(c *gin.Context) *{{.Package}} {
 var logicTpl = `package {{.package}}
 
 import (
-	"github.com/gin-gonic/gin"
-
 	"{{.typePackageSrc}}"
 )
 
-func (logic *{{.Package}}) {{.name}}Logic(c *gin.Context{{if .isRequest}}, req *{{.typePackage}}.{{.handler}}Request{{end}}) (*{{.typePackage}}.{{.handler}}Response, error) {
+func (logic *{{.Package}}) {{.name}}Logic({{if .isRequest}}req *{{.typePackage}}.{{.handler}}Request{{end}}) (*{{.typePackage}}.{{.handler}}Response, error) {
 	// todo logic code
 	return &{{.typePackage}}.{{.handler}}Response{}, nil
 }

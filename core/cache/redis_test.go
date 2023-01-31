@@ -3,10 +3,11 @@ package cache
 import (
 	"context"
 	"encoding/json"
-	"github.com/go-redis/redis/v9"
-	"github.com/magiconair/properties/assert"
 	"testing"
 	"time"
+
+	"github.com/magiconair/properties/assert"
+	"github.com/redis/go-redis/v9"
 )
 
 var redisConn = redis.NewClient(&redis.Options{Addr: "127.0.0.1:6379", Password: "123456"})

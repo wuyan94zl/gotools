@@ -2,8 +2,11 @@ package response
 
 import (
 	"fmt"
+	"reflect"
 	"strconv"
 	"strings"
+
+	"github.com/go-playground/validator/v10"
 )
 
 type Error struct {
@@ -32,4 +35,27 @@ type Success struct {
 
 func NewSuccess(data interface{}) Success {
 	return Success{Code: 200, Data: data}
+}
+
+func ValidateError(code int, err error, req interface{}) Error {
+	errs, ok := err.(validator.ValidationErrors)
+	if ok {
+		s := reflect.TypeOf(req)
+		msg := ""
+		for _, fieldError := range errs {
+			filed, _ := s.FieldByName(fieldError.Field())
+			// 获取统一错误消息
+			errText := filed.Tag.Get("msg")
+			if errText == "" {
+				errText = fieldError.Error()
+			}
+			if msg == "" {
+				msg = errText
+			} else {
+				msg = fmt.Sprintf("%s\n%s", msg, errText)
+			}
+		}
+		return Error{Code: code, Message: msg}
+	}
+	return Error{Code: code, Message: err.Error()}
 }
