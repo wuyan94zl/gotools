@@ -75,7 +75,7 @@ func genGormConn(c *Command) error {
 
 var genRedisConnTpl = `package conn
 
-import "github.com/go-redis/redis/v9"
+import "github.com/redis/go-redis/v9"
 
 var redisConfig RedisConfig
 
@@ -128,7 +128,7 @@ func genContainerKernel(c *Command) error {
 var genContainerTpl = `package container
 
 import (
-	"github.com/go-redis/redis/v9"
+	"github.com/redis/go-redis/v9"
 	"github.com/wuyan94zl/gotools/core/jwt"
 	"gorm.io/gorm"
 
