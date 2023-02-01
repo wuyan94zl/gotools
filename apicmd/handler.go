@@ -42,13 +42,13 @@ func {{.name}}Handler(c *gin.Context) {
 `
 
 func genHandler(c *Command) error {
-	wd := filepath.Join(c.wd, "handler", c.dir)
+	wd := filepath.Join(c.wd, "app", c.dir, "handler")
 	childDir := ""
 	if c.dir != "" {
 		childDir = "/" + c.dir
 	}
 	typePackage := fmt.Sprintf("%s/%s", c.projectPkg, "app/types")
-	logicPackage := fmt.Sprintf("%s/%s%s", c.projectPkg, "app/logic", childDir)
+	logicPackage := fmt.Sprintf("%s/%s%s/logic", c.projectPkg, "app", childDir)
 	name := utils.UpperOne(c.name)
 	paramCode := ""
 	route := c.routeUrl
@@ -70,7 +70,8 @@ func genHandler(c *Command) error {
 		Filename:     strings.ToLower(c.name) + ".go",
 		TemplateFile: handlerTpl,
 		Data: map[string]string{
-			"package":         filepath.Base(c.dir),
+			//"package":         filepath.Base(c.dir),
+			"package":         "handler",
 			"typePackageSrc":  typePackage,
 			"logicPackageSrc": logicPackage,
 			"typePackage":     filepath.Base(typePackage),

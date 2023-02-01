@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/wuyan94zl/gotools/core/utils"
 	"os"
-	"path/filepath"
 	"regexp"
 	"strings"
 	"unicode"
@@ -48,18 +47,7 @@ func (c *Command) Run() error {
 		return err
 	}
 
-	err = genRoute(c)
-	if err != nil {
-		return err
-	}
-	c.wd = filepath.Join(c.wd, "app")
-
 	err = genTypes(c)
-	if err != nil {
-		return err
-	}
-
-	err = genHandler(c)
 	if err != nil {
 		return err
 	}
@@ -69,6 +57,15 @@ func (c *Command) Run() error {
 		return err
 	}
 
+	err = genHandler(c)
+	if err != nil {
+		return err
+	}
+
+	err = genRoute(c)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 

@@ -22,7 +22,7 @@ func genTypes(c *Command) error {
 	if c.dir != "" {
 		fileName = c.dirName + ".go"
 	}
-	filePath := filepath.Join(c.wd, "types", fileName)
+	filePath := filepath.Join(c.wd, "app", "types", fileName)
 
 	_, err := os.Stat(filePath)
 	if err == nil {

@@ -23,7 +23,8 @@ func main() {
 
 	container.NewContainer(c)
 
-	app := gin.Default()
+	app := gin.New()
+	app.Use(logz.GinLogger(), logz.GinRecovery(true))
 	group := app.Group("")
 	router.RegisterHandlers(group)
 	app.Run(fmt.Sprintf("%s:%d", c.Host, c.Port))

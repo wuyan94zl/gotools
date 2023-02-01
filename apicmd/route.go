@@ -62,7 +62,7 @@ func register{{.routeReg}}Handler(app gin.IRoutes) {
 
 func createRoute(c *Command) error {
 	wd := filepath.Join(c.wd, "router")
-	handlerPkgSrc := fmt.Sprintf("%s/app/handler/%s", c.projectPkg, c.dir)
+	handlerPkgSrc := fmt.Sprintf("%s/app/%s/handler", c.projectPkg, c.dir)
 	return utils.GenFileCover(utils.FileGenConfig{
 		Dir:          wd,
 		Filename:     c.dirName + ".go",
@@ -70,11 +70,12 @@ func createRoute(c *Command) error {
 		Data: map[string]string{
 			"package":       "router",
 			"handlerPkgSrc": handlerPkgSrc,
-			"handler":       filepath.Base(c.dir),
-			"handlerName":   utils.UpperOne(c.name),
-			"method":        c.method,
-			"routeUrl":      c.routeUrl,
-			"routeReg":      c.routeReg,
+			//"handler":       filepath.Base(c.dir),
+			"handler":     "handler",
+			"handlerName": utils.UpperOne(c.name),
+			"method":      c.method,
+			"routeUrl":    c.routeUrl,
+			"routeReg":    c.routeReg,
 		},
 	})
 }
