@@ -10,23 +10,25 @@ import (
 var noCacheCustomModelTpl = `package {{.package}}
 
 import (
-	"github.com/go-redis/redis/v9"
 	"gorm.io/gorm"
-	"{{.projectPkg}}/{{.modelPkg}}"
+
+	"{{.projectPkg}}/{{.basePkg}}"
+	"{{.projectPkg}}/{{.tablePkg}}"
+
 )
 
 type (
 	{{.StructName}}Model interface {
-		{{.model}}.{{.StructName}}Model
+		base.IBase
 	}
 	custom{{.StructName}}Model struct {
-		*{{.model}}.Default{{.StructName}}Model
+		*base.Base
 	}
 )
 
-func New{{.StructName}}Model(gormDb *gorm.DB, cache *redis.Client) {{.StructName}}Model {
+func New{{.StructName}}Model(gormDb *gorm.DB) {{.StructName}}Model {
 	return &custom{{.StructName}}Model{
-		Default{{.StructName}}Model: {{.model}}.New{{.StructName}}Model(gormDb, cache),
+		Base: base.NewBase(tables.ConfigsModel{}, gormDb),
 	}
 }
 
@@ -34,7 +36,8 @@ func New{{.StructName}}Model(gormDb *gorm.DB, cache *redis.Client) {{.StructName
 
 func setGormNoCacheCustomModel(data *Command) error {
 	wd := filepath.Join(data.wd, VarStringDir)
-	modelPkg := filepath.Base(data.wd) + "/_gen"
+	basePkg := filepath.Base(data.wd) + "/base"
+	tablePkg := filepath.Base(data.wd) + "/tables"
 	err := utils.GenFile(utils.FileGenConfig{
 		Dir:          wd,
 		Filename:     "custom.go",
@@ -44,8 +47,8 @@ func setGormNoCacheCustomModel(data *Command) error {
 			"projectPkg": data.projectPkg,
 			"StructName": data.structName,
 			"structName": strings.ToLower(data.structName[:1]) + data.structName[1:],
-			"modelPkg":   modelPkg,
-			"model":      "_gen",
+			"basePkg":    basePkg,
+			"tablePkg":   tablePkg,
 		},
 	})
 	if err != nil {

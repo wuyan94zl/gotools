@@ -93,9 +93,14 @@ func (c *Command) Run() error {
 			return err
 		}
 	} else {
-		if err := setGormNoCacheModel(c); err != nil {
+		//if err := setGormNoCacheModel(c); err != nil {
+		//	return err
+		//}
+
+		if err := setGormBaseModel(c); err != nil {
 			return err
 		}
+
 		if err := setGormNoCacheCustomModel(c); err != nil {
 			return err
 		}

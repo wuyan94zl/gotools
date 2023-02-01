@@ -13,7 +13,7 @@ import (
 	"context"
 	"fmt"
 	{{.structImport}}
-	"github.com/go-redis/redis/v9"
+	"github.com/redis/go-redis/v9"
 	"github.com/wuyan94zl/gotools/core/model"
 	"gorm.io/gorm"
 )

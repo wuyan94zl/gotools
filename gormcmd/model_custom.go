@@ -10,7 +10,7 @@ import (
 var customModelTpl = `package {{.package}}
 
 import (
-	"github.com/go-redis/redis/v9"
+	"github.com/redis/go-redis/v9"
 	"gorm.io/gorm"
 	"{{.projectPkg}}/{{.modelPkg}}"
 )
