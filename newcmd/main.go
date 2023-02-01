@@ -9,11 +9,14 @@ var genMainTpl = `package main
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
+	"github.com/wuyan94zl/gotools/core/logz"
+	"github.com/wuyan94zl/gotools/core/utils"
+	
 	"{{.packageSrc}}/config"
 	"{{.packageSrc}}/container"
 	"{{.packageSrc}}/router"
-	"github.com/wuyan94zl/gotools/core/logz"
-	"github.com/wuyan94zl/gotools/core/utils"
 )
 
 func main() {
@@ -25,6 +28,11 @@ func main() {
 
 	app := gin.New()
 	app.Use(logz.GinLogger(), logz.GinRecovery(true))
+	
+	// swagger config exec swag init && uncomment the following line
+	// docs.SwaggerInfo.BasePath = ""
+	app.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
 	group := app.Group("")
 	router.RegisterHandlers(group)
 	app.Run(fmt.Sprintf("%s:%d", c.Host, c.Port))
