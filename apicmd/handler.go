@@ -47,7 +47,8 @@ func genHandler(c *Command) error {
 	if c.dir != "" {
 		childDir = "/" + c.dir
 	}
-	typePackage := fmt.Sprintf("%s/%s", c.projectPkg, "app/types")
+	//typePackage := fmt.Sprintf("%s/%s", c.projectPkg, "app/types")
+	typePackage := fmt.Sprintf("%s/%s/%s/types", c.projectPkg, "app", c.dir)
 	logicPackage := fmt.Sprintf("%s/%s%s/logic", c.projectPkg, "app", childDir)
 	name := utils.UpperOne(c.name)
 	paramCode := ""

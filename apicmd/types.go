@@ -18,11 +18,8 @@ type {{.name}}Response struct{}
 `
 
 func genTypes(c *Command) error {
-	fileName := "type_gen.go"
-	if c.dir != "" {
-		fileName = c.dirName + ".go"
-	}
-	filePath := filepath.Join(c.wd, "app", "types", fileName)
+	fileName := "types.go"
+	filePath := filepath.Join(c.wd, "app", c.dir, "types", fileName)
 
 	_, err := os.Stat(filePath)
 	if err == nil {
@@ -62,7 +59,7 @@ func createType(c *Command, filePath string) error {
 		Filename:     filepath.Base(filePath),
 		TemplateFile: typesTpl,
 		Data: map[string]string{
-			"package":   filepath.Base(filepath.Join(c.wd, "types")),
+			"package":   filepath.Base(filepath.Dir(filePath)),
 			"name":      c.handlerName,
 			"isRequest": c.isRequest,
 		},
