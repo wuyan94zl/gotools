@@ -38,7 +38,7 @@ func (c *Command) Run() error {
 	if err != nil {
 		return err
 	}
-	err = genErrCode(c)
+	err = genCommon(c)
 	if err != nil {
 		return err
 	}

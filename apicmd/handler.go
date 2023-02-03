@@ -11,10 +11,10 @@ var handlerTpl = `package {{.package}}
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/wuyan94zl/gotools/core/response"
 
-	{{if .isRequest}}"{{.typePackageSrc}}"{{end}}
 	"{{.logicPackageSrc}}"
+	{{if .isRequest}}"{{.typePackageSrc}}"{{end}}
+	"{{.projectPkg}}/common/response"
 )
 
 // {{.name}}Handler
@@ -24,20 +24,11 @@ import (
 {{.params}}{{.body}}// @Router /{{.route}} [{{.method}}]
 func {{.name}}Handler(c *gin.Context) {
 	{{if .isRequest}}req := new({{.typePackage}}.{{.handler}}Request)
-	err := c.ShouldBindJSON(req)
-	if err != nil {
-		c.JSON(200, response.ValidateError(500, err, *req))
+	if err := c.ShouldBindJSON(req); err != nil {
+		c.JSON(200, response.ValidateError(400, err, *req))
 		return
 	}
-	resp, err := {{.logicPackage}}.New{{.LogicPackage}}(c).{{.name}}Logic(req){{else}}resp, err := {{.logicPackage}}.New{{.LogicPackage}}(c).{{.name}}Logic(){{end}}
-	switch err.(type) {
-	case nil:
-		c.JSON(200, response.NewSuccess(resp))
-	case response.Error:
-		c.JSON(200, err)
-	default:
-		c.JSON(500, err)
-	}
+	{{end}}c.JSON(response.Result({{if .isRequest}}{{.logicPackage}}.New{{.LogicPackage}}(c).{{.name}}Logic(req){{else}}{{.logicPackage}}.New{{.LogicPackage}}(c).{{.name}}Logic(){{end}}))
 }
 `
 
@@ -73,6 +64,7 @@ func genHandler(c *Command) error {
 		Data: map[string]string{
 			//"package":         filepath.Base(c.dir),
 			"package":         "handler",
+			"projectPkg":      c.projectPkg,
 			"typePackageSrc":  typePackage,
 			"logicPackageSrc": logicPackage,
 			"typePackage":     filepath.Base(typePackage),

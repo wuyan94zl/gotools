@@ -48,7 +48,6 @@ func command() error {
 	if err != nil {
 		return err
 	}
-
 	command = exec.Command("gotools", "api", "-d", apicmd.VarStringDir, "-n", "info", "-m", "GET")
 	_, err = command.Output()
 	if err != nil {

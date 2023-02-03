@@ -59,3 +59,14 @@ func ValidateError(code int, err error, req interface{}) Error {
 	}
 	return Error{Code: code, Message: err.Error()}
 }
+
+func Result(resp any, err error) (int, any) {
+	switch err.(type) {
+	case nil:
+		return 200, NewSuccess(resp)
+	case Error:
+		return 200, err
+	default:
+		return 500, err
+	}
+}
