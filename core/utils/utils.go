@@ -4,7 +4,9 @@ import (
 	"bufio"
 	"bytes"
 	"errors"
+	"fmt"
 	"go/format"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -128,4 +130,23 @@ func ToLowers(str ...*string) {
 	for _, v := range str {
 		strings.ToLower(*v)
 	}
+}
+
+func AppendFileCode(filePath, searchCode, addCode, find string) (string, error) {
+	file, err := ioutil.ReadFile(filePath)
+	if err != nil {
+		return "", err
+	}
+	str := string(file)
+	return AppendStrCode(str, searchCode, addCode, find)
+}
+
+func AppendStrCode(str, searchCode, addCode, find string) (string, error) {
+	i := strings.Index(str, searchCode)
+	if i == -1 {
+		point := strings.Index(str, find)
+		fileStr := fmt.Sprintf("%s%s\n\t%s", str[0:point-1], addCode, str[point-1:])
+		return fileStr, nil
+	}
+	return "", nil
 }

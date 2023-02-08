@@ -43,27 +43,49 @@ Command: 'gotools api -m GET -d api/user -n info -p :id'
 }
 
 func command() error {
+	err := restfulList()
+	if err != nil {
+		return err
+	}
+	err = restfulDetail()
+	if err != nil {
+		return err
+	}
+	err = restfulUpdate()
+	if err != nil {
+		return err
+	}
+	err = restfulCreate()
+	if err != nil {
+		return err
+	}
+	return restfulDelete()
+}
+func restfulCreate() error {
 	command := exec.Command("gotools", "api", "-d", apicmd.VarStringDir, "-n", "create", "-m", "POST")
 	_, err := command.Output()
-	if err != nil {
-		return err
-	}
-	command = exec.Command("gotools", "api", "-d", apicmd.VarStringDir, "-n", "info", "-m", "GET")
-	_, err = command.Output()
-	if err != nil {
-		return err
-	}
-	command = exec.Command("gotools", "api", "-d", apicmd.VarStringDir, "-n", "update", "-m", "PUT")
-	_, err = command.Output()
-	if err != nil {
-		return err
-	}
-	command = exec.Command("gotools", "api", "-d", apicmd.VarStringDir, "-n", "delete", "-m", "DELETE")
-	_, err = command.Output()
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
+}
+
+func restfulDetail() error {
+	command := exec.Command("gotools", "api", "-d", apicmd.VarStringDir, "-n", "detail", "-m", "GET", "-p", ":id")
+	_, err := command.Output()
+	return err
+}
+func restfulUpdate() error {
+	command := exec.Command("gotools", "api", "-d", apicmd.VarStringDir, "-n", "update", "-m", "PUT", "-p", ":id")
+	_, err := command.Output()
+	return err
+}
+func restfulDelete() error {
+	command := exec.Command("gotools", "api", "-d", apicmd.VarStringDir, "-n", "delete", "-m", "DELETE", "-p", ":id")
+	_, err := command.Output()
+	return err
+}
+func restfulList() error {
+	command := exec.Command("gotools", "api", "-d", apicmd.VarStringDir, "-n", "list", "-m", "GET")
+	_, err := command.Output()
+	return err
 }
 
 func init() {

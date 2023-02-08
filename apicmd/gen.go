@@ -124,11 +124,16 @@ func (c *Command) initParams() error {
 	if c.name == "create" && c.method == "POST" {
 		c.routeUrl = fmt.Sprintf("%s", getUrl(VarStringDir))[1:]
 	} else if c.name == "update" && c.method == "PUT" {
+		c.params = ":id"
 		c.routeUrl = fmt.Sprintf("%s/:id", getUrl(VarStringDir))[1:]
 	} else if c.name == "delete" && c.method == "DELETE" {
+		c.params = ":id"
 		c.routeUrl = fmt.Sprintf("%s/:id", getUrl(VarStringDir))[1:]
-	} else if c.name == "info" && c.method == "GET" {
+	} else if c.name == "detail" && c.method == "GET" {
+		c.params = ":id"
 		c.routeUrl = fmt.Sprintf("%s/:id", getUrl(VarStringDir))[1:]
+	} else if c.name == "list" && c.method == "GET" {
+		c.routeUrl = fmt.Sprintf("%s", getUrl(VarStringDir))[1:]
 	} else {
 		c.routeUrl = fmt.Sprintf("%s%s%s", getUrl(VarStringDir), getUrl(nameToUrl(VarStringName)), getUrl(VarStringParams))[1:]
 	}

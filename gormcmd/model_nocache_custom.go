@@ -10,15 +10,12 @@ import (
 var noCacheCustomModelTpl = `package {{.package}}
 
 import (
-	"gorm.io/gorm"
-
+	"{{.projectPkg}}/container"
 	"{{.projectPkg}}/{{.basePkg}}"
-	"{{.projectPkg}}/{{.tablePkg}}"
-
 )
 
 type (
-	{{.StructName}}Model interface {
+	I{{.StructName}} interface {
 		base.IBase
 	}
 	custom{{.StructName}}Model struct {
@@ -26,9 +23,9 @@ type (
 	}
 )
 
-func New{{.StructName}}Model(gormDb *gorm.DB) {{.StructName}}Model {
+func New{{.StructName}}Model() I{{.StructName}} {
 	return &custom{{.StructName}}Model{
-		Base: base.NewBase(tables.ConfigsModel{}, gormDb),
+		Base: base.NewBase({{.StructName}}Model{}, container.Instance().DB),
 	}
 }
 

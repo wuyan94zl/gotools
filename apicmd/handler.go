@@ -21,6 +21,7 @@ import (
 // @Summary todo {{.name}}Handler
 // @Description todo 接口说明
 // @Tags {{.tag}}
+// @Security JwtAuth
 {{.params}}{{.body}}// @Router /{{.route}} [{{.method}}]
 func {{.name}}Handler(c *gin.Context) {
 	{{if .isRequest}}req := new({{.typePackage}}.{{.handler}}Request)

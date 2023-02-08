@@ -19,6 +19,16 @@ import (
 	"{{.packageSrc}}/router"
 )
 
+// @title 代码生成工具 gotools
+// @version 1.0
+// @description 代码生成工具
+
+// @securityDefinitions.apikey JwtAuth
+// @in header
+// @name Authorization
+
+// @host localhost:8888
+// @BasePath /v1
 func main() {
 	c := config.GlobalConfig
 	utils.MustConfig("/config.yaml", c)
@@ -28,9 +38,8 @@ func main() {
 
 	app := gin.New()
 	app.Use(logz.GinLogger(), logz.GinRecovery(true))
-	
-	// swagger config exec swag init && uncomment the following line
-	// docs.SwaggerInfo.BasePath = ""
+
+	// exec swag init && import _ "{{.packageSrc}}/docs"
 	app.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	group := app.Group("")

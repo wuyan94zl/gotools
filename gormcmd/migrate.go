@@ -3,10 +3,8 @@ package gormcmd
 import (
 	"fmt"
 	"github.com/wuyan94zl/gotools/core/utils"
-	"io/ioutil"
 	"os"
 	"path/filepath"
-	"strings"
 )
 
 var migrateTplCache = `package {{.package}}
@@ -14,8 +12,7 @@ var migrateTplCache = `package {{.package}}
 import (
 	"github.com/wuyan94zl/gotools/core/logz"
 	"gorm.io/gorm"
-
-	"{{.projectPkg}}/models/tables"
+	"{{.projectPkg}}/{{.modelPkgSrc}}"
 )
 
 func AutoMigrate(gorm *gorm.DB) {
@@ -28,7 +25,7 @@ func AutoMigrate(gorm *gorm.DB) {
 
 func setTables() []interface{} {
 	var tbs []interface{}
-	tbs = append(tbs, &tables.{{.StructName}}{})
+	tbs = append(tbs, &{{.modelPkg}}.{{.StructName}}{})
 	return tbs
 }
 `
@@ -39,9 +36,11 @@ func createMigrate(c *Command) error {
 		Filename:     "migrate.go",
 		TemplateFile: migrateTplCache,
 		Data: map[string]string{
-			"package":    filepath.Base(c.wd),
-			"StructName": c.structName,
-			"projectPkg": c.projectPkg,
+			"package":     filepath.Base(c.wd),
+			"StructName":  c.structName,
+			"projectPkg":  c.projectPkg,
+			"modelPkgSrc": "models/" + VarStringDir,
+			"modelPkg":    filepath.Base(VarStringDir),
 		},
 	})
 	if err != nil {
@@ -51,19 +50,17 @@ func createMigrate(c *Command) error {
 }
 func appendMigrate(c *Command) error {
 	filePath := filepath.Join(c.wd, "migrate.go")
-	file, err := ioutil.ReadFile(filePath)
+	code := fmt.Sprintf("tbs = append(tbs, &%s.%s{})", c.packageName, c.structName)
+	fileCode, err := utils.AppendFileCode(filePath, code, code, "return tbs")
 	if err != nil {
 		return err
 	}
-	fileStr := string(file)
-	code := fmt.Sprintf("tbs = append(tbs, &tables.%s{})", c.structName)
-	i := strings.Index(fileStr, code)
-	if i == -1 {
-		point := strings.Index(fileStr, "return tbs")
-		fileStr = fmt.Sprintf("%s\t%s\n%s", fileStr[0:point-1], code, fileStr[point-1:])
-		return utils.WriteInfile(filePath, fileStr)
+	code = fmt.Sprintf("\"%s/models/%s\"", c.projectPkg, c.packageName)
+	fileCode, err = utils.AppendStrCode(fileCode, code, code, "\"gorm.io/gorm\"")
+	if err != nil {
+		return err
 	}
-	return nil
+	return utils.WriteInfile(filePath, fileCode)
 }
 
 func setMigrate(c *Command) error {
