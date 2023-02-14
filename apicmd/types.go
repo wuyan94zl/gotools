@@ -18,8 +18,8 @@ type {{.name}}Response struct{}
 `
 
 func genTypes(c *Command) error {
-	fileName := "types.go"
-	filePath := filepath.Join(c.wd, "app", c.dir, "types", fileName)
+	fileName := strings.ToLower(getName(c.dir)) + ".go"
+	filePath := filepath.Join(c.wd, "app", "types", fileName)
 
 	_, err := os.Stat(filePath)
 	if err == nil {

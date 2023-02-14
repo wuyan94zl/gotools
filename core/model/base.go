@@ -2,6 +2,7 @@ package model
 
 import (
 	"context"
+	"fmt"
 	"gorm.io/gorm"
 )
 
@@ -10,10 +11,11 @@ type IModel interface {
 	Create(ctx context.Context, info interface{}) error
 	Update(ctx context.Context, info interface{}) error
 	Delete(ctx context.Context, info interface{}) error
+	FindByFiled(ctx context.Context, info any, filed string, val any) error
 
-	Build(ctx context.Context) IModel
-	Where(query string, args ...interface{}) IModel
-	With(query string, args ...interface{}) IModel
+	ConditionWhere(query string, args ...interface{}) IModel
+	ConditionJoins(query string, args ...interface{}) IModel
+	ConditionWith(query string, args ...interface{}) IModel
 	One(one interface{}) error
 	List(list interface{}) error
 	Paginate(list interface{}, page, pageSize int) (int64, error)
@@ -37,18 +39,21 @@ func (m *Model) Update(ctx context.Context, info interface{}) error {
 func (m *Model) Delete(ctx context.Context, info interface{}) error {
 	return m.Conn.WithContext(ctx).Delete(info).Error
 }
-
-func (m *Model) Build(ctx context.Context) IModel {
-	m.BuildCondition = m.Conn.WithContext(ctx).Model(m.Table)
-	return m
+func (m *Model) FindByFiled(ctx context.Context, info any, filed string, val any) error {
+	return m.Conn.WithContext(ctx).Where(fmt.Sprintf("%s = ?", filed), val).First(info).Error
 }
 
-func (m *Model) Where(query string, args ...interface{}) IModel {
+func (m *Model) ConditionWhere(query string, args ...interface{}) IModel {
 	m.BuildCondition = m.BuildCondition.Where(query, args...)
 	return m
 }
 
-func (m *Model) With(query string, args ...interface{}) IModel {
+func (m *Model) ConditionJoins(query string, args ...interface{}) IModel {
+	m.BuildCondition = m.BuildCondition.Joins(query, args...)
+	return m
+}
+
+func (m *Model) ConditionWith(query string, args ...interface{}) IModel {
 	m.BuildCondition = m.BuildCondition.Preload(query, args...)
 	return m
 }

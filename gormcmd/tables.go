@@ -21,8 +21,8 @@ import (
 {{.customModel}}
 `
 
-func createTypes(c *Command) error {
-	filePath := filepath.Join(c.wd, VarStringDir, "table.go")
+func createTables(c *Command) error {
+	filePath := filepath.Join(c.wd, "table", c.tableName+".go")
 	_, err := os.Stat(filePath)
 	custom := `// edit the custom code below, never delete this line of code
 
@@ -38,10 +38,10 @@ type ` + c.structName + `Model struct {
 func createType(c *Command, filePath, customModel string) error {
 	err := utils.GenFileCover(utils.FileGenConfig{
 		Dir:          filepath.Dir(filePath),
-		Filename:     "table.go",
+		Filename:     filepath.Base(filePath),
 		TemplateFile: typeTpl,
 		Data: map[string]string{
-			"package":      c.packageName,
+			"package":      filepath.Base(filepath.Dir(filePath)),
 			"struct":       c.structData,
 			"structImport": c.structImport,
 			"structName":   c.structName,

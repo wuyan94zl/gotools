@@ -148,5 +148,5 @@ func AppendStrCode(str, searchCode, addCode, find string) (string, error) {
 		fileStr := fmt.Sprintf("%s%s\n\t%s", str[0:point-1], addCode, str[point-1:])
 		return fileStr, nil
 	}
-	return "", nil
+	return str, nil
 }

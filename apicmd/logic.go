@@ -38,7 +38,7 @@ func (logic *{{.Package}}) {{.name}}Logic({{if .isRequest}}req *{{.typePackage}}
 
 func genLogic(c *Command) error {
 	wd := filepath.Join(c.wd, "app", c.dir, "logic")
-	typePackage := fmt.Sprintf("%s/%s/%s/types", c.projectPkg, "app", c.dir)
+	typePackage := fmt.Sprintf("%s/%s/types", c.projectPkg, "app")
 	name := utils.UpperOne(c.name)
 
 	utils.GenFile(utils.FileGenConfig{

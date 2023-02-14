@@ -23,6 +23,7 @@ import (
 // @Tags {{.tag}}
 // @Security JwtAuth
 {{.params}}{{.body}}// @Router /{{.route}} [{{.method}}]
+{{.response}}
 func {{.name}}Handler(c *gin.Context) {
 	{{if .isRequest}}req := new({{.typePackage}}.{{.handler}}Request)
 	if err := c.ShouldBindJSON(req); err != nil {
@@ -40,7 +41,7 @@ func genHandler(c *Command) error {
 		childDir = "/" + c.dir
 	}
 	//typePackage := fmt.Sprintf("%s/%s", c.projectPkg, "app/types")
-	typePackage := fmt.Sprintf("%s/%s/%s/types", c.projectPkg, "app", c.dir)
+	typePackage := fmt.Sprintf("%s/%s/types", c.projectPkg, "app")
 	logicPackage := fmt.Sprintf("%s/%s%s/logic", c.projectPkg, "app", childDir)
 	name := utils.UpperOne(c.name)
 	paramCode := ""
@@ -54,9 +55,11 @@ func genHandler(c *Command) error {
 		}
 	}
 	body := ""
+
 	if c.isRequest == "true" {
-		body = fmt.Sprintf("// @Param request body %s.%sRequest to \"body params\"\n", filepath.Base(typePackage), c.handlerName)
+		body = fmt.Sprintf("// @Param request body %s.%sRequest to \"body params\"\n", "types", c.handlerName)
 	}
+	response := fmt.Sprintf("// @Success 200 {object} %s.%sResponse", "types", c.handlerName)
 
 	return utils.GenFile(utils.FileGenConfig{
 		Dir:          wd,
@@ -79,6 +82,7 @@ func genHandler(c *Command) error {
 			"route":           route,
 			"params":          paramCode,
 			"body":            body,
+			"response":        response,
 		},
 	})
 }

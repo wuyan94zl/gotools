@@ -25,15 +25,10 @@ func NewBase(table interface{}, conn *gorm.DB) *Base {
 }`
 
 func setGormBaseModel(data *Command) error {
-	err := utils.GenFile(utils.FileGenConfig{
+	return utils.GenFile(utils.FileGenConfig{
 		Dir:          filepath.Join(data.wd, "base"),
 		Filename:     "base.go",
 		TemplateFile: modelBaseTpl,
 		Data:         map[string]string{},
 	})
-	if err != nil {
-		return err
-	}
-	err = createTypes(data)
-	return err
 }

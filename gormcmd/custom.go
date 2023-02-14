@@ -7,26 +7,26 @@ import (
 	"strings"
 )
 
-var customModelTpl = `package {{.package}}
+var noCacheCustomModelTpl = `package {{.package}}
 
 import (
-	"github.com/redis/go-redis/v9"
-	"gorm.io/gorm"
-	"{{.projectPkg}}/{{.modelPkg}}"
+	"{{.projectPkg}}/container"
+	"{{.projectPkg}}/{{.basePkg}}"
+	"{{.projectPkg}}/{{.tablePkg}}"
 )
 
 type (
-	{{.StructName}}Model interface {
-		{{.modelPkg}}.{{.StructName}}Model
+	I{{.StructName}} interface {
+		base.IBase
 	}
 	custom{{.StructName}}Model struct {
-		*{{.modelPkg}}.Default{{.StructName}}Model
+		*base.Base
 	}
 )
 
-func New{{.StructName}}Model(gormDb *gorm.DB, cache *redis.Client) {{.StructName}}Model {
+func New{{.StructName}}Model() I{{.StructName}} {
 	return &custom{{.StructName}}Model{
-		Default{{.StructName}}Model: {{.modelPkg}}.New{{.StructName}}Model(gormDb,cache),
+		Base: base.NewBase(table.{{.StructName}}Model{}, container.Instance().DB),
 	}
 }
 
@@ -34,17 +34,19 @@ func New{{.StructName}}Model(gormDb *gorm.DB, cache *redis.Client) {{.StructName
 
 func setGormCustomModel(data *Command) error {
 	wd := filepath.Join(data.wd, VarStringDir)
-	modelPkg := filepath.Base(data.wd)
+	basePkg := filepath.Base(data.wd) + "/base"
+	tablePkg := filepath.Base(data.wd) + "/table"
 	err := utils.GenFile(utils.FileGenConfig{
 		Dir:          wd,
-		Filename:     "custom.go",
-		TemplateFile: customModelTpl,
+		Filename:     data.tableName + "_custom.go",
+		TemplateFile: noCacheCustomModelTpl,
 		Data: map[string]string{
 			"package":    data.packageName,
 			"projectPkg": data.projectPkg,
 			"StructName": data.structName,
 			"structName": strings.ToLower(data.structName[:1]) + data.structName[1:],
-			"modelPkg":   modelPkg,
+			"basePkg":    basePkg,
+			"tablePkg":   tablePkg,
 		},
 	})
 	if err != nil {

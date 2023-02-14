@@ -76,6 +76,7 @@ func (c *Command) Run() error {
 	c.structName = structData.StructCode[0].Table
 	c.tableName = nameToTableName(strings.ToLower(c.structName[:1]) + c.structName[1:])
 	c.deletedFiled = VarStringDeleted
+
 	c.wd = wd
 	i := strings.Index(string(file), c.deletedFiled)
 	if i == -1 {
@@ -83,30 +84,34 @@ func (c *Command) Run() error {
 	} else {
 		c.hasSoftDelete = "1"
 	}
-	varC := ""
-	if VarBoolCache {
-		varC = "-c"
-		if err := setGormModel(c); err != nil {
-			return err
-		}
-		if err := setGormCustomModel(c); err != nil {
-			return err
-		}
-	} else {
-		//if err := setGormNoCacheModel(c); err != nil {
-		//	return err
-		//}
+	//varC := ""
+	//if VarBoolCache {
+	//varC = "-c"
+	//if err := setGormModel(c); err != nil {
+	//	return err
+	//}
+	//if err := setGormCustomModel(c); err != nil {
+	//	return err
+	//}
+	//} else {
+	//if err := setGormNoCacheModel(c); err != nil {
+	//	return err
+	//}
 
-		if err := setGormBaseModel(c); err != nil {
-			return err
-		}
-
-		if err := setGormNoCacheCustomModel(c); err != nil {
-			return err
-		}
+	if err := setGormBaseModel(c); err != nil {
+		return err
 	}
+
+	if err := createTables(c); err != nil {
+		return err
+	}
+
+	if err := setGormCustomModel(c); err != nil {
+		return err
+	}
+	//}
 	setMigrate(c)
-	c.Command = fmt.Sprintf("%s --src %s --dir %s %s --deleted %s", c.Command, VarStringSrc, VarStringDir, varC, VarStringDeleted)
+	c.Command = fmt.Sprintf("%s --src %s --dir %s --deleted %s", c.Command, VarStringSrc, VarStringDir, VarStringDeleted)
 	return nil
 }
 

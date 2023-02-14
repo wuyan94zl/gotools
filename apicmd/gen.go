@@ -120,7 +120,7 @@ func (c *Command) initParams() error {
 	c.wd = wd
 	c.dirName = strings.ToLower(getName(c.dir))
 	c.routeReg = getName(c.dir)
-	c.handlerName = getName(c.name)
+	c.handlerName = getName(c.dir + "/" + c.name)
 	if c.name == "create" && c.method == "POST" {
 		c.routeUrl = fmt.Sprintf("%s", getUrl(VarStringDir))[1:]
 	} else if c.name == "update" && c.method == "PUT" {

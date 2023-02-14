@@ -39,8 +39,8 @@ func createMigrate(c *Command) error {
 			"package":     filepath.Base(c.wd),
 			"StructName":  c.structName,
 			"projectPkg":  c.projectPkg,
-			"modelPkgSrc": "models/" + VarStringDir,
-			"modelPkg":    filepath.Base(VarStringDir),
+			"modelPkgSrc": "models/table",
+			"modelPkg":    "table",
 		},
 	})
 	if err != nil {
@@ -50,12 +50,12 @@ func createMigrate(c *Command) error {
 }
 func appendMigrate(c *Command) error {
 	filePath := filepath.Join(c.wd, "migrate.go")
-	code := fmt.Sprintf("tbs = append(tbs, &%s.%s{})", c.packageName, c.structName)
+	code := fmt.Sprintf("tbs = append(tbs, &%s.%s{})", "table", c.structName)
 	fileCode, err := utils.AppendFileCode(filePath, code, code, "return tbs")
 	if err != nil {
 		return err
 	}
-	code = fmt.Sprintf("\"%s/models/%s\"", c.projectPkg, c.packageName)
+	code = fmt.Sprintf("\"%s/models/%s\"", c.projectPkg, "table")
 	fileCode, err = utils.AppendStrCode(fileCode, code, code, "\"gorm.io/gorm\"")
 	if err != nil {
 		return err
