@@ -4,12 +4,9 @@ import (
 	"bufio"
 	"bytes"
 	"errors"
-	"fmt"
 	"go/format"
-	"io/ioutil"
 	"os"
 	"path/filepath"
-	"strings"
 	"text/template"
 )
 
@@ -91,12 +88,12 @@ func CreteFile(dir string, fileName string) (fp *os.File, created bool, err erro
 	return
 }
 
-func GetDir(method string, name string) string {
-	baseDir, err := os.Getwd()
-	if err != nil {
-		return ""
-	}
-	return filepath.Join(baseDir, "app", method, name)
+func WriteInfile(filePath, code string) error {
+	fp, _ := os.Create(filePath)
+	defer fp.Close()
+	code = FormatCode(code)
+	_, err := fp.WriteString(code)
+	return err
 }
 
 func GetPackage(wd string) (string, error) {
@@ -109,50 +106,4 @@ func GetPackage(wd string) (string, error) {
 		return "", errors.New("执行位置错误")
 	}
 	return string(line)[7:], nil
-}
-
-func WriteInfile(filePath, code string) error {
-	fp, _ := os.Create(filePath)
-	defer fp.Close()
-	code = FormatCode(code)
-	_, err := fp.WriteString(code)
-	return err
-}
-
-func UpperOne(str string) string {
-	if len(str) == 0 {
-		return ""
-	}
-	return strings.ToUpper(str[0:1]) + str[1:]
-}
-
-func ToLowers(str ...*string) {
-	for _, v := range str {
-		strings.ToLower(*v)
-	}
-}
-
-func ToUppers(str ...*string) {
-	for _, v := range str {
-		strings.ToUpper(*v)
-	}
-}
-
-func AppendFileCode(filePath, searchCode, addCode, find string) (string, error) {
-	file, err := ioutil.ReadFile(filePath)
-	if err != nil {
-		return "", err
-	}
-	str := string(file)
-	return AppendStrCode(str, searchCode, addCode, find)
-}
-
-func AppendStrCode(str, searchCode, addCode, find string) (string, error) {
-	i := strings.Index(str, searchCode)
-	if i == -1 {
-		point := strings.Index(str, find)
-		fileStr := fmt.Sprintf("%s%s\n\t%s", str[0:point-1], addCode, str[point-1:])
-		return fileStr, nil
-	}
-	return str, nil
 }

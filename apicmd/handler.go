@@ -2,7 +2,7 @@ package apicmd
 
 import (
 	"fmt"
-	"github.com/wuyan94zl/gotools/core/utils"
+	"github.com/wuyan94zl/gotools/utils"
 	"path/filepath"
 	"strings"
 )
@@ -17,20 +17,20 @@ import (
 	"{{.projectPkg}}/common/response"
 )
 
-// {{.name}}Handler
-// @Summary todo {{.name}}Handler
+// {{.nameCamelCase}}Handler
+// @Summary todo {{.nameCamelCase}}Handler
 // @Description todo 接口说明
 // @Tags {{.tag}}
 // @Security JwtAuth
 {{.params}}{{.body}}// @Router /{{.route}} [{{.method}}]
 {{.response}}
-func {{.name}}Handler(c *gin.Context) {
-	{{if .isRequest}}req := new({{.typePackage}}.{{.handler}}Request)
+func {{.nameCamelCase}}Handler(c *gin.Context) {
+	{{if .isRequest}}req := new({{.typePackage}}.{{.dirCamelCase}}{{.nameCamelCase}}Request)
 	if err := c.ShouldBindJSON(req); err != nil {
 		c.JSON(200, response.ValidateError(400, err, *req))
 		return
 	}
-	{{end}}c.JSON(response.Result({{if .isRequest}}{{.logicPackage}}.New{{.LogicPackage}}(c).{{.name}}Logic(req){{else}}{{.logicPackage}}.New{{.LogicPackage}}(c).{{.name}}Logic(){{end}}))
+	{{end}}c.JSON(response.Result({{if .isRequest}}{{.logicPackage}}.New{{.LogicPackage}}(c).{{.nameCamelCase}}Logic(req){{else}}{{.logicPackage}}.New{{.LogicPackage}}(c).{{.nameCamelCase}}Logic(){{end}}))
 }
 `
 
@@ -40,10 +40,9 @@ func genHandler(c *Command) error {
 	if c.dir != "" {
 		childDir = "/" + c.dir
 	}
-	//typePackage := fmt.Sprintf("%s/%s", c.projectPkg, "app/types")
 	typePackage := fmt.Sprintf("%s/%s/types", c.projectPkg, "app")
 	logicPackage := fmt.Sprintf("%s/%s%s/logic", c.projectPkg, "app", childDir)
-	name := utils.UpperOne(c.name)
+
 	paramCode := ""
 	route := c.routeUrl
 	if c.params != "" {
@@ -57,27 +56,26 @@ func genHandler(c *Command) error {
 	body := ""
 
 	if c.isRequest == "true" {
-		body = fmt.Sprintf("// @Param request body %s.%sRequest to \"body params\"\n", "types", c.handlerName)
+		body = fmt.Sprintf("// @Param request body %s.%s%sRequest to \"body params\"\n", "types", c.dirCamelCase, c.nameCamelCase)
 	}
-	response := fmt.Sprintf("// @Success 200 {object} %s.%sResponse", "types", c.handlerName)
+	response := fmt.Sprintf("// @Success 200 {object} %s.%s%sResponse", "types", c.dirCamelCase, c.nameCamelCase)
 
 	return utils.GenFile(utils.FileGenConfig{
 		Dir:          wd,
-		Filename:     strings.ToLower(c.name) + ".go",
+		Filename:     strings.ToLower(c.nameCamelCase) + ".go",
 		TemplateFile: handlerTpl,
 		Data: map[string]string{
-			//"package":         filepath.Base(c.dir),
-			"package":         "handler",
+			"package":         filepath.Base(wd),
 			"projectPkg":      c.projectPkg,
 			"typePackageSrc":  typePackage,
 			"logicPackageSrc": logicPackage,
 			"typePackage":     filepath.Base(typePackage),
 			"logicPackage":    filepath.Base(logicPackage),
-			"LogicPackage":    utils.UpperOne(filepath.Base(logicPackage)),
-			"name":            name,
-			"handler":         c.handlerName,
+			"LogicPackage":    utils.UpperFirst(filepath.Base(logicPackage)),
+			"nameCamelCase":   c.nameCamelCase,
+			"dirCamelCase":    c.dirCamelCase,
 			"isRequest":       c.isRequest,
-			"tag":             "api",
+			"tag":             c.dirCamelCase,
 			"method":          strings.ToLower(c.method),
 			"route":           route,
 			"params":          paramCode,

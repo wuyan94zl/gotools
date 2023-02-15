@@ -11,14 +11,14 @@ import (
 
 var typesTpl = `package {{.package}}
 
-{{if .isRequest}}type {{.name}}Request struct{}{{end}}
+{{if .isRequest}}type {{.dirCamelCase}}{{.nameCamelCase}}Request struct{}{{end}}
 
-type {{.name}}Response struct{}
+type {{.dirCamelCase}}{{.nameCamelCase}}Response struct{}
 
 `
 
 func genTypes(c *Command) error {
-	fileName := strings.ToLower(getName(c.dir)) + ".go"
+	fileName := strings.ToLower(c.dirCamelCase) + ".go"
 	filePath := filepath.Join(c.wd, "app", "types", fileName)
 
 	_, err := os.Stat(filePath)
@@ -38,14 +38,14 @@ func appendType(c *Command, filePath string) error {
 	fileStr := string(file)
 
 	if c.isRequest != "" {
-		requestStr := fmt.Sprintf("%sRequest", c.handlerName)
+		requestStr := fmt.Sprintf("%s%sRequest", c.dirCamelCase, c.nameCamelCase)
 		i := strings.Index(fileStr, requestStr)
 		if i == -1 {
 			fileStr = fmt.Sprintf("%s\ntype %s struct {}\n", fileStr, requestStr)
 		}
 	}
 
-	responseStr := fmt.Sprintf("%sResponse", c.handlerName)
+	responseStr := fmt.Sprintf("%s%sResponse", c.dirCamelCase, c.nameCamelCase)
 	i := strings.Index(fileStr, responseStr)
 	if i == -1 {
 		fileStr = fmt.Sprintf("%s\ntype %s struct {}", fileStr, responseStr)
@@ -59,9 +59,10 @@ func createType(c *Command, filePath string) error {
 		Filename:     filepath.Base(filePath),
 		TemplateFile: typesTpl,
 		Data: map[string]string{
-			"package":   filepath.Base(filepath.Dir(filePath)),
-			"name":      c.handlerName,
-			"isRequest": c.isRequest,
+			"package":       filepath.Base(filepath.Dir(filePath)),
+			"dirCamelCase":  c.dirCamelCase,
+			"nameCamelCase": c.nameCamelCase,
+			"isRequest":     c.isRequest,
 		},
 	})
 }

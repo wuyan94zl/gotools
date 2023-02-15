@@ -26,7 +26,7 @@ type (
 
 func New{{.StructName}}Model() I{{.StructName}} {
 	return &custom{{.StructName}}Model{
-		Base: base.NewBase(table.{{.StructName}}Model{}, container.Instance().DB),
+		Base: base.NewBase(table.{{.StructName}}{}, container.Instance().DB),
 	}
 }
 

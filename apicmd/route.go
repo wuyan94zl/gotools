@@ -2,7 +2,7 @@ package apicmd
 
 import (
 	"fmt"
-	"github.com/wuyan94zl/gotools/core/utils"
+	"github.com/wuyan94zl/gotools/utils"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -10,7 +10,7 @@ import (
 )
 
 func genRoute(c *Command) error {
-	if c.dirName != "" {
+	if c.dirCamelCase != "" {
 		err := appendRouteRegister(c)
 		if err != nil {
 			return err
@@ -31,7 +31,7 @@ func appendRouteRegister(c *Command) error {
 
 	registerPackage := fmt.Sprintf("\"%s/app/%s\"", c.projectPkg, c.dir)
 	appendCode(c, filePath, registerPackage, "", ")")
-	register := fmt.Sprintf("%s.Register%sHandler", filepath.Base(c.dir), c.routeReg)
+	register := fmt.Sprintf("%s.Register%sHandler", filepath.Base(c.dir), c.dirCamelCase)
 	return appendCode(c, filePath, register, "(app)", "}")
 }
 
@@ -46,7 +46,7 @@ func registerRoute(c *Command) error {
 }
 
 func appendRoute(c *Command, filePath string) error {
-	route := fmt.Sprintf("app.%s(\"%s\", %s.%sHandler)", c.method, c.routeUrl, "handler", utils.UpperOne(c.name))
+	route := fmt.Sprintf("app.%s(\"%s\", %s.%sHandler)", c.method, c.routeUrl, "handler", c.nameCamelCase)
 	return appendCode(c, filePath, route, "", "}")
 }
 
@@ -57,14 +57,13 @@ import (
 	"{{.handlerPkgSrc}}"
 )
 
-func Register{{.routeReg}}Handler(app gin.IRoutes) {
-	app.{{.method}}("{{.routeUrl}}", {{.handler}}.{{.handlerName}}Handler)
+func Register{{.dirCamelCase}}Handler(app gin.IRoutes) {
+	app.{{.method}}("{{.routeUrl}}", {{.handler}}.{{.nameCamelCase}}Handler)
 }
 
 `
 
 func createRoute(c *Command, filePath string) error {
-	//wd := filepath.Join(c.wd, "router")
 	wd := filepath.Dir(filePath)
 	handlerPkgSrc := fmt.Sprintf("%s/app/%s/handler", c.projectPkg, c.dir)
 	return utils.GenFileCover(utils.FileGenConfig{
@@ -74,12 +73,11 @@ func createRoute(c *Command, filePath string) error {
 		Data: map[string]string{
 			"package":       filepath.Base(wd),
 			"handlerPkgSrc": handlerPkgSrc,
-			//"handler":       filepath.Base(c.dir),
-			"handler":     "handler",
-			"handlerName": utils.UpperOne(c.name),
-			"method":      c.method,
-			"routeUrl":    c.routeUrl,
-			"routeReg":    c.routeReg,
+			"handler":       "handler",
+			"nameCamelCase": c.nameCamelCase,
+			"method":        c.method,
+			"routeUrl":      c.routeUrl,
+			"dirCamelCase":  c.dirCamelCase,
 		},
 	})
 }

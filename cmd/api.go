@@ -5,6 +5,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/wuyan94zl/gotools/apicmd"
 	"os/exec"
+	"strings"
 )
 
 // cronCmd represents the cron command
@@ -22,7 +23,7 @@ Command: 'gotools api -m GET -d api/user -n info -p :id'
 -p params: corresponds to '/:id' int the url, and ':name/:id' can be used for multiple arguments
  `,
 	Run: func(cmd *cobra.Command, args []string) {
-		if apicmd.VarStringMethod == "RESTFUL" {
+		if strings.ToUpper(apicmd.VarStringMethod) == "RESTFUL" {
 			err := command()
 			if err != nil {
 				fmt.Println("command err:", err)

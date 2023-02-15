@@ -3,7 +3,7 @@ package apicmd
 import (
 	"errors"
 	"fmt"
-	"github.com/wuyan94zl/gotools/core/utils"
+	"github.com/wuyan94zl/gotools/utils"
 	"os"
 	"regexp"
 	"strings"
@@ -24,17 +24,13 @@ type Command struct {
 	method string
 	params string
 
-	projectPkg  string // 项目包名
-	wd          string // 执行目录
-	routeUrl    string // 路由地址
-	routeReg    string // 路由handler注册
-	handlerName string // 路由handler函数名
-	dirName     string // 路径名消去/，字母小写
-	Command     string // 完整命令
-	packageName string // 包名
-	PackageName string // 函数名
-	middleware  string // 中间件
-	isRequest   string // 是否有request参数
+	projectPkg    string // 项目包名
+	wd            string // 执行目录
+	dirCamelCase  string // 路径大驼峰
+	nameCamelCase string // 函数大驼峰
+	routeUrl      string // 路由地址
+	Command       string // 完整命令
+	isRequest     string // 是否有request参数
 }
 
 func (c *Command) Run() error {
@@ -81,17 +77,21 @@ func (c *Command) validateFlags() error {
 		return errors.New("api method is required")
 	}
 	utils.ToLowers(&VarStringDir, &VarStringParams)
-	ok, err := regexp.MatchString("^([a-z/]*)$", VarStringDir)
+	ok, err := regexp.MatchString("^([a-z_/]*)$", VarStringDir)
 	if err != nil || !ok {
 		return errors.New("the --dir parameter is invalid")
 	}
-	ok, err = regexp.MatchString("^([A-z]+)$", VarStringName)
+
+	ok, err = regexp.MatchString("^([A-z_]+)$", VarStringName)
 	if err != nil || !ok {
 		return errors.New("the --name parameter is invalid")
 	}
+
+	utils.ToUppers(&VarStringMethod)
 	if VarStringMethod != "POST" && VarStringMethod != "GET" && VarStringMethod != "PUT" && VarStringMethod != "DELETE" && VarStringMethod != "RESTFUL" {
 		return errors.New("the --method parameter is invalid, only GET or POST or PUT or DELETE")
 	}
+
 	if VarStringParams != "" {
 		ok, err = regexp.MatchString("^([a-z:/]+)$", VarStringParams)
 		if err != nil || !ok {
@@ -118,9 +118,14 @@ func (c *Command) initParams() error {
 	}
 	c.Command = fmt.Sprintf("%s --dir %s --name %s --method %s", c.Command, VarStringDir, VarStringName, VarStringMethod)
 	c.wd = wd
-	c.dirName = strings.ToLower(getName(c.dir))
-	c.routeReg = getName(c.dir)
-	c.handlerName = getName(c.dir + "/" + c.name)
+	c.dirCamelCase = utils.GetCamelCaseName(c.dir)
+	c.nameCamelCase = utils.GetCamelCaseName(c.name)
+	if c.method == "GET" || c.method == "DELETE" {
+		c.isRequest = ""
+	} else {
+		c.isRequest = "true"
+	}
+
 	if c.name == "create" && c.method == "POST" {
 		c.routeUrl = fmt.Sprintf("%s", getUrl(VarStringDir))[1:]
 	} else if c.name == "update" && c.method == "PUT" {
@@ -137,22 +142,9 @@ func (c *Command) initParams() error {
 	} else {
 		c.routeUrl = fmt.Sprintf("%s%s%s", getUrl(VarStringDir), getUrl(nameToUrl(VarStringName)), getUrl(VarStringParams))[1:]
 	}
-	if c.method == "GET" || c.method == "DELETE" {
-		c.isRequest = ""
-	} else {
-		c.isRequest = "true"
-	}
+
 	//fmt.Println("pkg", c.projectPkg, "dirname", c.dirName, "routerReg", c.routeReg, "handlerName", c.handlerName)
 	return nil
-}
-
-func getName(str string) string {
-	s := strings.Split(str, "/")
-	rlt := ""
-	for _, v := range s {
-		rlt += utils.UpperOne(v)
-	}
-	return rlt
 }
 
 func getUrl(str string) string {
