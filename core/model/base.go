@@ -11,8 +11,9 @@ type IModel interface {
 	Create(ctx context.Context, info interface{}) error
 	Update(ctx context.Context, info interface{}) error
 	Delete(ctx context.Context, info interface{}) error
-	FindByFiled(ctx context.Context, info any, filed string, val any) error
+	FindByField(ctx context.Context, info any, filed string, val any) error
 
+	DB() *gorm.DB
 	ConditionWhere(query string, args ...interface{}) IModel
 	ConditionJoins(query string, args ...interface{}) IModel
 	ConditionWith(query string, args ...interface{}) IModel
@@ -39,33 +40,31 @@ func (m *Model) Update(ctx context.Context, info interface{}) error {
 func (m *Model) Delete(ctx context.Context, info interface{}) error {
 	return m.Conn.WithContext(ctx).Delete(info).Error
 }
-func (m *Model) FindByFiled(ctx context.Context, info any, filed string, val any) error {
+func (m *Model) FindByField(ctx context.Context, info any, filed string, val any) error {
 	return m.Conn.WithContext(ctx).Where(fmt.Sprintf("%s = ?", filed), val).First(info).Error
 }
 
+func (m *Model) DB() *gorm.DB {
+	return m.BuildCondition
+}
 func (m *Model) ConditionWhere(query string, args ...interface{}) IModel {
 	m.BuildCondition = m.BuildCondition.Where(query, args...)
 	return m
 }
-
 func (m *Model) ConditionJoins(query string, args ...interface{}) IModel {
 	m.BuildCondition = m.BuildCondition.Joins(query, args...)
 	return m
 }
-
 func (m *Model) ConditionWith(query string, args ...interface{}) IModel {
 	m.BuildCondition = m.BuildCondition.Preload(query, args...)
 	return m
 }
-
 func (m *Model) One(one interface{}) error {
 	return m.BuildCondition.First(one).Error
 }
-
 func (m *Model) List(list interface{}) error {
 	return m.BuildCondition.Find(list).Error
 }
-
 func (m *Model) Paginate(list interface{}, page, pageSize int) (int64, error) {
 	var total int64
 	err := m.BuildCondition.Count(&total).Error
