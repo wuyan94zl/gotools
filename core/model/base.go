@@ -1,17 +1,16 @@
 package model
 
 import (
-	"context"
 	"fmt"
 	"gorm.io/gorm"
 )
 
 type IModel interface {
-	First(ctx context.Context, first interface{}, id interface{}) error
-	Create(ctx context.Context, info interface{}) error
-	Update(ctx context.Context, info interface{}) error
-	Delete(ctx context.Context, info interface{}) error
-	FindByField(ctx context.Context, info any, filed string, val any) error
+	First(first interface{}, id interface{}) error
+	Create(info interface{}) error
+	Update(info interface{}) error
+	Delete(info interface{}) error
+	FindByField(info any, filed string, val any) error
 
 	DB() *gorm.DB
 	ConditionWhere(query string, args ...interface{}) IModel
@@ -28,20 +27,20 @@ type Model struct {
 	Table          interface{}
 }
 
-func (m *Model) First(ctx context.Context, first interface{}, id interface{}) error {
-	return m.Conn.WithContext(ctx).First(first, id).Error
+func (m *Model) First(first interface{}, id interface{}) error {
+	return m.Conn.First(first, id).Error
 }
-func (m *Model) Create(ctx context.Context, info interface{}) error {
-	return m.Conn.WithContext(ctx).Create(info).Error
+func (m *Model) Create(info interface{}) error {
+	return m.Conn.Create(info).Error
 }
-func (m *Model) Update(ctx context.Context, info interface{}) error {
-	return m.Conn.WithContext(ctx).Save(info).Error
+func (m *Model) Update(info interface{}) error {
+	return m.Conn.Save(info).Error
 }
-func (m *Model) Delete(ctx context.Context, info interface{}) error {
-	return m.Conn.WithContext(ctx).Delete(info).Error
+func (m *Model) Delete(info interface{}) error {
+	return m.Conn.Delete(info).Error
 }
-func (m *Model) FindByField(ctx context.Context, info any, filed string, val any) error {
-	return m.Conn.WithContext(ctx).Where(fmt.Sprintf("%s = ?", filed), val).First(info).Error
+func (m *Model) FindByField(info any, filed string, val any) error {
+	return m.Conn.Where(fmt.Sprintf("%s = ?", filed), val).First(info).Error
 }
 
 func (m *Model) DB() *gorm.DB {

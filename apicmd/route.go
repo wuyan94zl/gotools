@@ -31,7 +31,7 @@ func appendRouteRegister(c *Command) error {
 
 	registerPackage := fmt.Sprintf("\"%s/app/%s\"", c.projectPkg, c.dir)
 	appendCode(c, filePath, registerPackage, "", ")")
-	register := fmt.Sprintf("%s.Register%sHandler", filepath.Base(c.dir), c.dirCamelCase)
+	register := fmt.Sprintf("%s.RegisterHandler", filepath.Base(c.dir))
 	return appendCode(c, filePath, register, "(app)", "}")
 }
 
@@ -46,7 +46,7 @@ func registerRoute(c *Command) error {
 }
 
 func appendRoute(c *Command, filePath string) error {
-	route := fmt.Sprintf("app.%s(\"%s\", %s.%sHandler)", c.method, c.routeUrl, "handler", c.nameCamelCase)
+	route := fmt.Sprintf("r.%s(\"%s\", %s.%sHandler)", c.method, c.routeUrl, "handler", c.nameCamelCase)
 	return appendCode(c, filePath, route, "", "}")
 }
 
@@ -57,8 +57,9 @@ import (
 	"{{.handlerPkgSrc}}"
 )
 
-func Register{{.dirCamelCase}}Handler(app gin.IRoutes) {
-	app.{{.method}}("{{.routeUrl}}", {{.handler}}.{{.nameCamelCase}}Handler)
+func RegisterHandler(app *gin.RouterGroup) {
+	r := app.Group("{{.routeBase}}")
+	r.{{.method}}("{{.routeUrl}}", {{.handler}}.{{.nameCamelCase}}Handler)
 }
 
 `
@@ -76,6 +77,7 @@ func createRoute(c *Command, filePath string) error {
 			"handler":       "handler",
 			"nameCamelCase": c.nameCamelCase,
 			"method":        c.method,
+			"routeBase":     c.routeBase,
 			"routeUrl":      c.routeUrl,
 			"dirCamelCase":  c.dirCamelCase,
 		},

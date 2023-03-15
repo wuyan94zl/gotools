@@ -28,6 +28,7 @@ type Command struct {
 	wd            string // 执行目录
 	dirCamelCase  string // 路径大驼峰
 	nameCamelCase string // 函数大驼峰
+	routeBase     string // 路由前缀
 	routeUrl      string // 路由地址
 	Command       string // 完整命令
 	isRequest     string // 是否有request参数
@@ -125,22 +126,27 @@ func (c *Command) initParams() error {
 	} else {
 		c.isRequest = "true"
 	}
-
+	c.routeBase = VarStringDir
 	if c.name == "create" && c.method == "POST" {
-		c.routeUrl = fmt.Sprintf("%s", getUrl(VarStringDir))[1:]
+		//c.routeUrl = fmt.Sprintf("%s", getUrl(VarStringDir))[1:]
+		c.routeUrl = ""
 	} else if c.name == "update" && c.method == "PUT" {
 		c.params = ":id"
-		c.routeUrl = fmt.Sprintf("%s/:id", getUrl(VarStringDir))[1:]
+		//c.routeUrl = fmt.Sprintf("%s/:id", getUrl(VarStringDir))[1:]
+		c.routeUrl = ":id"
 	} else if c.name == "delete" && c.method == "DELETE" {
 		c.params = ":id"
-		c.routeUrl = fmt.Sprintf("%s/:id", getUrl(VarStringDir))[1:]
+		//c.routeUrl = fmt.Sprintf("%s/:id", getUrl(VarStringDir))[1:]
+		c.routeUrl = ":id"
 	} else if c.name == "detail" && c.method == "GET" {
 		c.params = ":id"
-		c.routeUrl = fmt.Sprintf("%s/:id", getUrl(VarStringDir))[1:]
+		//c.routeUrl = fmt.Sprintf("%s/:id", getUrl(VarStringDir))[1:]
+		c.routeUrl = ":id"
 	} else if c.name == "list" && c.method == "GET" {
-		c.routeUrl = fmt.Sprintf("%s", getUrl(VarStringDir))[1:]
+		//c.routeUrl = fmt.Sprintf("%s", getUrl(VarStringDir))[1:]
+		c.routeUrl = ""
 	} else {
-		c.routeUrl = fmt.Sprintf("%s%s%s", getUrl(VarStringDir), getUrl(nameToUrl(VarStringName)), getUrl(VarStringParams))[1:]
+		c.routeUrl = fmt.Sprintf("%s%s", getUrl(nameToUrl(VarStringName)), getUrl(VarStringParams))[1:]
 	}
 
 	//fmt.Println("pkg", c.projectPkg, "dirname", c.dirName, "routerReg", c.routeReg, "handlerName", c.handlerName)
