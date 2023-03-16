@@ -30,9 +30,9 @@ func appendRouteRegister(c *Command) error {
 	filePath := filepath.Join(wd, "router", "route.go")
 
 	registerPackage := fmt.Sprintf("\"%s/app/%s\"", c.projectPkg, c.dir)
-	appendCode(c, filePath, registerPackage, "", ")")
+	appendCode(c, filePath, registerPackage, "", ")", false)
 	register := fmt.Sprintf("%s.RegisterHandler", filepath.Base(c.dir))
-	return appendCode(c, filePath, register, "(app)", "}")
+	return appendCode(c, filePath, register, "(app)", "}", true)
 }
 
 func registerRoute(c *Command) error {
@@ -47,7 +47,7 @@ func registerRoute(c *Command) error {
 
 func appendRoute(c *Command, filePath string) error {
 	route := fmt.Sprintf("r.%s(\"%s\", %s.%sHandler)", c.method, c.routeUrl, "handler", c.nameCamelCase)
-	return appendCode(c, filePath, route, "", "}")
+	return appendCode(c, filePath, route, "", "}", true)
 }
 
 var routeTpl = `package {{.package}}
@@ -84,13 +84,18 @@ func createRoute(c *Command, filePath string) error {
 	})
 }
 
-func appendCode(c *Command, filePath, code, ext, find string) error {
+func appendCode(c *Command, filePath, code, ext, find string, isLast bool) error {
 	file, err := ioutil.ReadFile(filePath)
 	if err != nil {
 		return err
 	}
 	fileStr := string(file)
-	i := strings.Index(fileStr, code)
+	i := 0
+	if isLast {
+		i = strings.LastIndex(fileStr, code)
+	} else {
+		i = strings.Index(fileStr, code)
+	}
 	if i == -1 {
 		point := strings.Index(fileStr, find)
 		fileStr := fmt.Sprintf("%s\n\t%s%s%s", fileStr[0:point-1], code, ext, fileStr[point-1:])

@@ -48,14 +48,17 @@ var baseTpl = `package {{.package}}
 
 import (
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
+	"{{.projectPkg}}/container"
 )
 
 type {{.Package}} struct {
 	ctx *gin.Context
+	db  *gorm.DB
 }
 
 func New{{.Package}}(c *gin.Context) *{{.Package}} {
-	return &{{.Package}}{ctx: c}
+	return &{{.Package}}{ctx: c, db: container.Instance().DB.WithContext(c)}
 }
 
 `
@@ -67,8 +70,9 @@ func genBaseLogic(c *Command) error {
 		Filename:     "base.go",
 		TemplateFile: baseTpl,
 		Data: map[string]string{
-			"package": filepath.Base(wd),
-			"Package": utils.UpperFirst(filepath.Base(wd)),
+			"package":    filepath.Base(wd),
+			"Package":    utils.UpperFirst(filepath.Base(wd)),
+			"projectPkg": c.projectPkg,
 		},
 	})
 }

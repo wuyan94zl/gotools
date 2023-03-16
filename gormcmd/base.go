@@ -21,7 +21,7 @@ type Base struct {
 }
 
 func NewBase(table interface{}, conn *gorm.DB) *Base {
-	return &Base{model.Model{Conn: conn, Table: table, BuildCondition: conn.Model(table)}}
+	return &Base{model.Model{DB: conn.Model(table), Table: table}}
 }`
 
 func setGormBaseModel(data *Command) error {

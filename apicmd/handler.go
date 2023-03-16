@@ -44,7 +44,10 @@ func genHandler(c *Command) error {
 	logicPackage := fmt.Sprintf("%s/%s%s/logic", c.projectPkg, "app", childDir)
 
 	paramCode := ""
-	route := c.routeUrl
+	route := c.routeBase
+	if c.routeUrl != "" {
+		route = fmt.Sprintf("%s/%s", route, c.routeUrl)
+	}
 	if c.params != "" {
 		params := strings.Split(c.params, "/")
 		for i := 0; i < len(params); i++ {
