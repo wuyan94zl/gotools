@@ -28,10 +28,10 @@ func genRoute(c *Command) error {
 func appendRouteRegister(c *Command) error {
 	wd, _ := os.Getwd()
 	filePath := filepath.Join(wd, "router", "route.go")
-
-	registerPackage := fmt.Sprintf("\"%s/app/%s\"", c.projectPkg, c.dir)
+	name := strings.ToLower(c.dirCamelCase[0:1]) + c.dirCamelCase[1:]
+	registerPackage := fmt.Sprintf("%s \"%s/app/%s\"", name, c.projectPkg, c.dir)
 	appendCode(c, filePath, registerPackage, "", ")", false)
-	register := fmt.Sprintf("%s.RegisterHandler", filepath.Base(c.dir))
+	register := fmt.Sprintf("%s.RegisterHandler", name)
 	return appendCode(c, filePath, register, "(app)", "}", true)
 }
 

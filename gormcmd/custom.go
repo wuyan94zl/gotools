@@ -18,16 +18,16 @@ import (
 
 type (
 	I{{.StructName}} interface {
-		base.IBase
+		base.IModel
 	}
 	custom{{.StructName}}Model struct {
-		*base.Base
+		*base.Model
 	}
 )
 
 func New{{.StructName}}Model(db *gorm.DB) I{{.StructName}} {
 	return &custom{{.StructName}}Model{
-		Base: base.NewBase(table.{{.StructName}}{}, db),
+		Model: base.NewModel(table.{{.StructName}}{}, db),
 	}
 }
 
