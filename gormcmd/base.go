@@ -74,7 +74,7 @@ func (m *Model) Paginate(list interface{}, page, pageSize int) (int64, error) {
 func setGormBaseModel(data *Command) error {
 	return utils.GenFile(utils.FileGenConfig{
 		Dir:          filepath.Join(data.wd, "base"),
-		Filename:     "base.go",
+		Filename:     "model.go",
 		TemplateFile: modelBaseTpl,
 		Data:         map[string]string{},
 	})
