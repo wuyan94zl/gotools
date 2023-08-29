@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/wuyan94zl/gotools/core/utils"
 	"path/filepath"
-	"strings"
 )
 
 var noCacheCustomModelTpl = `package {{.package}}
@@ -12,8 +11,8 @@ var noCacheCustomModelTpl = `package {{.package}}
 import (
 	"gorm.io/gorm"
 
-	"{{.projectPkg}}/{{.basePkg}}"
-	"{{.projectPkg}}/{{.tablePkg}}"
+	"{{.nameSpace}}/{{.basePkg}}"
+	"{{.nameSpace}}/{{.tablePkg}}"
 )
 
 type (
@@ -33,19 +32,18 @@ func New{{.StructName}}Model(db *gorm.DB) I{{.StructName}} {
 
 `
 
-func setGormCustomModel(data *Command) error {
-	wd := filepath.Join(data.wd, VarStringDir)
-	basePkg := filepath.Base(data.wd) + "/base"
-	tablePkg := filepath.Base(data.wd) + "/table"
+func (c *Command) setGormCustomModel() error {
+	wd := filepath.Join(c.wd, c.dir)
+	basePkg := c.dir + "/base"
+	tablePkg := c.dir + "/table"
 	err := utils.GenFile(utils.FileGenConfig{
 		Dir:          wd,
-		Filename:     data.tableName + "_custom.go",
+		Filename:     c.tableName + ".go",
 		TemplateFile: noCacheCustomModelTpl,
 		Data: map[string]string{
-			"package":    data.packageName,
-			"projectPkg": data.projectPkg,
-			"StructName": data.structName,
-			"structName": strings.ToLower(data.structName[:1]) + data.structName[1:],
+			"package":    filepath.Base(c.dir),
+			"nameSpace":  c.nameSpace,
+			"StructName": c.structName,
 			"basePkg":    basePkg,
 			"tablePkg":   tablePkg,
 		},

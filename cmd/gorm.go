@@ -12,23 +12,17 @@ var gormCmd = &cobra.Command{
 	Short: "mysql ddl to generating  gorm model original code",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		model := &gormcmd.Command{
-			Command: cmd.CommandPath(),
-		}
+		model := &gormcmd.Command{}
 		err := model.Run()
 		if err != nil {
 			fmt.Println(err)
-		} else {
-			//commandLog(model.Command)
-			fmt.Println(model.Command, "Down .")
 		}
 	},
 }
 
 func init() {
-	gormCmd.Flags().StringVarP(&gormcmd.VarStringSrc, "src", "s", "", "The path or path globbing patterns of the ddl")
-	gormCmd.Flags().StringVarP(&gormcmd.VarStringDir, "dir", "d", "", "The generated path")
-	gormCmd.Flags().BoolVarP(&gormcmd.VarBoolCache, "cache", "c", false, "The model is set to cache")
-	gormCmd.Flags().StringVarP(&gormcmd.VarStringDeleted, "soft", "f", "deleted", "The model soft delete field")
+	gormCmd.Flags().StringVarP(&gormcmd.VarStringSource, "source", "s", "root:123456@tcp(localhost:3306)/blogs", "Default root:123456@tcp(localhost:3306)/blogs")
+	gormCmd.Flags().StringVarP(&gormcmd.VarStringDir, "dir", "d", "", "")
+	gormCmd.Flags().StringVarP(&gormcmd.VarTable, "table", "t", "", "")
 	rootCmd.AddCommand(gormCmd)
 }

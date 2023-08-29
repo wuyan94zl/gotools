@@ -1,71 +1,89 @@
 package gormcmd
 
 import (
-	"errors"
+	"database/sql"
 	"fmt"
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/wuyan94zl/gotools/core/utils"
 	"github.com/wuyan94zl/sql2gorm/parser"
-	"io/ioutil"
 	"os"
-	"path/filepath"
-	"regexp"
-	"strings"
-	"unicode"
 )
 
-var VarStringSrc string
+var VarStringSource string
 var VarStringDir string
-var VarStringDeleted string
-var VarBoolCache bool
+var VarTable string
 
 type Command struct {
-	Command       string
-	projectPkg    string // 项目包名
-	tableName     string
-	packageName   string
-	structName    string
-	structData    string
-	structImport  string
-	deletedFiled  string
-	hasSoftDelete string
-	wd            string
+	wd        string
+	nameSpace string
+	dir       string
+
+	tableName    string
+	structName   string
+	structData   string
+	structImport string
 }
 
-func (c *Command) GetDir() string {
-	return ""
+func getAllTable(db *sql.DB) ([]string, error) {
+	rows, err := db.Query("SHOW TABLES")
+	if err != nil {
+		panic(err)
+	}
+	defer rows.Close()
+	var tables []string
+	for rows.Next() {
+		var table string
+		err = rows.Scan(&table)
+		if err != nil {
+			return nil, err
+		}
+		tables = append(tables, table)
+	}
+
+	return tables, nil
 }
 
 func (c *Command) Run() error {
-	if VarStringSrc == "" {
-		return errors.New("gorm --src is required")
+	c.wd, _ = os.Getwd()
+	nameSpace, err := utils.GetPackage(c.wd)
+	if err != nil {
+		return err
 	}
-	if VarStringDir == "" {
-		return errors.New("gorm --dir is required")
+	c.nameSpace = nameSpace
+	c.dir = VarStringDir + "/model"
+
+	db, err := sql.Open("mysql", VarStringSource)
+
+	if err != nil {
+		panic(err)
 	}
-	err := validateGormFlags()
+	tables, _ := getAllTable(db)
+	for _, table := range tables {
+		if VarTable != "" && VarTable != table {
+			continue
+		}
+		rows, err := db.Query(fmt.Sprintf("SHOW CREATE TABLE %s", table))
+		if err != nil {
+			panic(err)
+		}
+		if rows.Next() {
+			var t, s string
+			err := rows.Scan(&t, &s)
+			if err != nil {
+				panic(err)
+			}
+			c.genModel(t, s)
+		}
+	}
+	return nil
+}
+
+func (c *Command) genModel(tableName, code string) error {
+	structData, err := parser.ParseSql(code, parser.WithNoNullType(), parser.WithGormType(), parser.WithIndex(), parser.WithJsonTag())
 	if err != nil {
 		return err
 	}
 
-	wd, _ := os.Getwd()
-	pkg, err := utils.GetPackage(filepath.Dir(wd))
-	if err != nil {
-		return err
-	}
-	c.projectPkg = pkg
-	abs, err := filepath.Abs(VarStringSrc)
-	if err != nil {
-		return err
-	}
-	file, err := ioutil.ReadFile(abs)
-	if err != nil {
-		return err
-	}
-	structData, err := parser.ParseSql(string(file), parser.WithNoNullType(), parser.WithGormType(), parser.WithIndex(), parser.WithJsonTag())
-	if err != nil {
-		return err
-	}
-	c.packageName = filepath.Base(VarStringDir)
 	if len(structData.ImportPath) > 0 {
 		for _, v := range structData.ImportPath {
 			c.structImport = fmt.Sprintf("%s\"%s\"\n", c.structImport, v)
@@ -74,71 +92,20 @@ func (c *Command) Run() error {
 
 	c.structData = structData.StructCode[0].Code
 	c.structName = structData.StructCode[0].Table
-	c.tableName = nameToTableName(strings.ToLower(c.structName[:1]) + c.structName[1:])
-	c.deletedFiled = VarStringDeleted
+	c.tableName = tableName
 
-	c.wd = wd
-	i := strings.Index(string(file), c.deletedFiled)
-	if i == -1 {
-		c.hasSoftDelete = "0"
-	} else {
-		c.hasSoftDelete = "1"
-	}
-	//varC := ""
-	//if VarBoolCache {
-	//varC = "-c"
-	//if err := setGormModel(c); err != nil {
-	//	return err
-	//}
-	//if err := setGormCustomModel(c); err != nil {
-	//	return err
-	//}
-	//} else {
-	//if err := setGormNoCacheModel(c); err != nil {
-	//	return err
-	//}
-
-	if err := setGormBaseModel(c); err != nil {
+	if err := c.setGormBaseModel(); err != nil {
 		return err
 	}
 
-	if err := createTables(c); err != nil {
+	if err := c.createTables(); err != nil {
 		return err
 	}
 
-	if err := setGormCustomModel(c); err != nil {
+	if err := c.setGormCustomModel(); err != nil {
 		return err
 	}
-	//}
-	setMigrate(c)
-	c.Command = fmt.Sprintf("%s --src %s --dir %s --deleted %s", c.Command, VarStringSrc, VarStringDir, VarStringDeleted)
+	c.setMigrate()
+	fmt.Println(c.tableName, "model gen Down.")
 	return nil
-}
-
-func validateGormFlags() error {
-	utils.ToLowers(&VarStringDir, &VarStringDeleted)
-	ok, err := regexp.MatchString("^([a-z/]+)$", VarStringDir)
-	if err != nil || !ok {
-		return errors.New("the --dir parameter is invalid")
-	}
-	ok, err = regexp.MatchString("^([A-z/.]+)$", VarStringSrc)
-	if err != nil || !ok {
-		return errors.New("the --src parameter is invalid")
-	}
-	ok, err = regexp.MatchString("^([a-z_]+)$", VarStringDeleted)
-	if err != nil || !ok {
-		return errors.New("the --deleted parameter is invalid")
-	}
-	return nil
-}
-
-func nameToTableName(str string) string {
-	newStr := ""
-	for i, v := range str {
-		if unicode.IsUpper(v) {
-			newStr += "_"
-		}
-		newStr += strings.ToLower(str[i : i+1])
-	}
-	return newStr
 }
